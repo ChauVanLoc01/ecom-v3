@@ -19,7 +19,6 @@ import { Queue } from 'bull'
 import { Cache } from 'cache-manager'
 import { BackgroundAction, BackgroundName } from 'common/constants/background-job.constant'
 import { getStoreExist, sendMail } from 'common/constants/event.constant'
-import { instance } from 'common/decorators/roles.decorator'
 import { Role } from 'common/enums/role.enum'
 import { Status } from 'common/enums/status.enum'
 import { CurrentStoreType, CurrentUserType } from 'common/types/current.type'
@@ -33,7 +32,7 @@ import { RegisterDTO } from '../dtos/register.dto'
 import { ResetPasswordType as ResetPasswordDTOType } from '../dtos/reset_password.dto'
 import { ResetPasswordForEmployee } from '../dtos/reset_password_for_employee.dto'
 import { SendOtpType } from '../dtos/sendOTP.dto'
-import { EmailInfor, PasswordData, ResetPasswordType } from '../workers/mail.worker'
+import { EmailInfor } from '../workers/mail.worker'
 
 @Injectable()
 export class AuthService {
@@ -62,13 +61,13 @@ export class AuthService {
         })
     }
 
-    async hashPassword(password: string): Promise<string> {
-        let salt = await bcrypt.genSalt(10)
-        return bcrypt.hash(password, salt)
+    hashPassword(password: string): string {
+        return bcrypt.hashSync(password, 10)
     }
 
-    async comparePassword(password: string, hash: string): Promise<boolean> {
-        return bcrypt.compare(password, hash)
+    comparePassword(payload: { password: string; hash: string }): boolean {
+        let { hash, password } = payload
+        return bcrypt.compareSync(password, hash)
     }
 
     async verify(username: string, password: string): Promise<Account> {
@@ -77,17 +76,11 @@ export class AuthService {
                 username
             }
         })
-        console.log('accoutn exist', accountExist);
 
         if (!accountExist) {
             throw new UnauthorizedException('Tài khoản không tồn tại')
         }
-
-        const isTruePassword = await this.comparePassword(password, accountExist.password)
-
-        let hashPassword = await this.hashPassword(password)
-
-        console.log('password after hash', accountExist.password, hashPassword);
+        const isTruePassword = this.comparePassword({ hash: accountExist.password, password })
 
         if (!isTruePassword) {
             throw new UnauthorizedException('Mật khẩu không đúng')
@@ -247,7 +240,7 @@ export class AuthService {
             throw new BadRequestException('User name đã tồn tại')
         }
 
-        let hash_password = await this.hashPassword(password)
+        let hash_password = this.hashPassword(password)
 
         const [{ createdAt, status, ...rest }, { storeRoleId }] = await this.prisma.$transaction(
             async (tx) => {
@@ -343,6 +336,8 @@ export class AuthService {
                 throw new BadRequestException('User name đã tồn tại')
             }
 
+            let hashPassword = this.hashPassword(password)
+
             const [createdUser, createdStoreRole, createdAccount] = await this.prisma.$transaction(
                 async (tx) => {
                     const userId = uuidv4()
@@ -370,7 +365,7 @@ export class AuthService {
                         tx.account.create({
                             data: {
                                 username,
-                                password: await this.hashPassword(password),
+                                password: hashPassword,
                                 userId: userId,
                                 storeRoleId: storeRoleId,
                                 createdBy: currentStore.userId
@@ -424,13 +419,15 @@ export class AuthService {
                 throw new NotFoundException('Tài khoản không tồn tại')
             }
 
+            let hashPassword = this.hashPassword(body.password)
+
             const updatedAccount = await this.prisma.account.update({
                 where: {
                     username: accountExist.username
                 },
                 data: {
                     username: body.username,
-                    password: await this.hashPassword(body.password)
+                    password: hashPassword
                 }
             })
 
@@ -459,13 +456,15 @@ export class AuthService {
             })
 
             if (!accountExist) throw new BadRequestException('Tải khoản không tồn tại')
-
-            let isMatching = await this.comparePassword(current_password, accountExist.password)
+            let isMatching = this.comparePassword({
+                hash: accountExist.password,
+                password: current_password
+            })
 
             if (!isMatching) {
                 throw new BadRequestException('Mật khẩu hiện tại không đúng')
             } else {
-                new_password = await this.hashPassword(new_password)
+                new_password = this.hashPassword(new_password)
             }
 
             const { password, ...rest } = await this.prisma.account.update({
@@ -484,7 +483,6 @@ export class AuthService {
                 result: undefined
             }
         } catch (err) {
-            console.log('error', err)
             throw new HttpException(err.message, err.status)
         }
     }
@@ -498,7 +496,6 @@ export class AuthService {
                 Account_Account_userIdToUser: true
             }
         })
-        console.log('userExist', JSON.stringify(userExist))
 
         if (!userExist) {
             throw new UnauthorizedException('Người dùng không tồn tại')
@@ -511,7 +508,6 @@ export class AuthService {
             subject: 'Mã xác nhận yêu cầu thay đổi mật khẩu',
             to: email
         }
-        console.log('sendMailQueru', this.sendMailQueue)
         this.user_client.emit(sendMail, {
             code,
             username: userExist.Account_Account_userIdToUser[0].username,
@@ -527,20 +523,24 @@ export class AuthService {
 
     async resetPassword({ code }: ResetPasswordDTOType): Promise<Return> {
         const fromCache = await this.cacheManager.get<string>(`${code}_RESET_PASSWORD`)
-        console.log('fromCache', fromCache)
 
         if (!fromCache) {
             throw new BadRequestException('Mã xác nhận không đúng hoặc đã hết hạn')
         }
 
-        let { new_password, username } = JSON.parse(fromCache) as { username; new_password }
+        let { new_password, username } = JSON.parse(fromCache) as {
+            username: string
+            new_password: string
+        }
+
+        console.log('fromCache', fromCache)
 
         const { password, ...rest } = await this.prisma.account.update({
             where: {
                 username
             },
             data: {
-                password: await this.hashPassword(new_password),
+                password: this.hashPassword(new_password),
                 updatedAt: new Date().toISOString()
             }
         })

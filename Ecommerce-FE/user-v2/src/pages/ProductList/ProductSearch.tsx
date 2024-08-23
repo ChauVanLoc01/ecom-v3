@@ -82,13 +82,14 @@ const ProductSearch = () => {
                 onClick={() => setOpen(true)}
             />
             <Dialog.Root onOpenChange={setOpen} open={open}>
-                <Dialog.Content maxWidth='1000px' className='!rounded-8'>
+                <Dialog.Content maxWidth='1000px' className='!rounded-8 h-[60%]'>
                     <Dialog.Title>Tìm kiếm sản phẩm</Dialog.Title>
                     <Flex direction={'column'} gapY={'4'}>
                         <Flex direction={'column'} gapY={'1'}>
                             <Flex gapX={'2'} align={'stretch'}>
                                 <TextField.Root
-                                    className='flex-grow'
+                                    type='text'
+                                    className='flex-grow [&>*]:shadow-transparent'
                                     placeholder='Nhập từ khóa...'
                                     size={'3'}
                                     value={search}
@@ -127,10 +128,10 @@ const ProductSearch = () => {
                                     )}
                                 </>
                             ) : (
-                                <Flex justify={'center'} align={'center'}>
+                                <Flex justify={'center'} align={'center'} className='py-28'>
                                     <img
-                                        src='https://cdn-icons-png.flaticon.com/512/3002/3002827.png'
-                                        className='w-32 h-3w-32'
+                                        src='https://cdn-icons-png.flaticon.com/512/7486/7486820.png'
+                                        className='size-32'
                                         alt='search'
                                     />
                                 </Flex>

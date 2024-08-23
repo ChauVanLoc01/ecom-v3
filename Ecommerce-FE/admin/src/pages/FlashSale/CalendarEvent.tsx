@@ -6,11 +6,25 @@ type CalendarProps = {
     promotionObjs: Dictionary<SalePromotion>
     onSelectEvent: (event: SalePromotion) => () => void
     storePromotionObj: Dictionary<StoreWithProductSalePromotion>
+    currentDate: Date
+    setCurrentDate: React.Dispatch<React.SetStateAction<Date>>
 }
 
-const CalendarEvent = ({ promotionObjs, onSelectEvent, storePromotionObj }: CalendarProps) => {
+const CalendarEvent = ({
+    promotionObjs,
+    onSelectEvent,
+    storePromotionObj,
+    currentDate,
+    setCurrentDate
+}: CalendarProps) => {
     return (
-        <Calendar promotionObjs={promotionObjs} onSelectEvent={onSelectEvent} storePromotionObj={storePromotionObj} />
+        <Calendar
+            currentDate={currentDate}
+            setCurrentDate={setCurrentDate}
+            promotionObjs={promotionObjs}
+            onSelectEvent={onSelectEvent}
+            storePromotionObj={storePromotionObj}
+        />
     )
 }
 

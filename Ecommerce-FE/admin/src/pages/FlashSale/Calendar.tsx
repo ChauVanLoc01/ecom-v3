@@ -24,9 +24,11 @@ type CalendarProps = {
     promotionObjs: Dictionary<SalePromotion>
     storePromotionObj: Dictionary<StoreWithProductSalePromotion>
     onSelectEvent: (event: SalePromotion) => () => void
+    currentDate: Date
+    setCurrentDate: React.Dispatch<React.SetStateAction<Date>>
 }
 
-const Calendar = ({ promotionObjs, onSelectEvent, storePromotionObj }: CalendarProps) => {
+const Calendar = ({ promotionObjs, onSelectEvent, storePromotionObj, currentDate, setCurrentDate }: CalendarProps) => {
     const parentRef = useRef<HTMLDivElement | null>(null)
     const scrollableNodeRef = useRef<any>(null)
     const [onTop, setOnTop] = useState<boolean>(true)
@@ -44,8 +46,6 @@ const Calendar = ({ promotionObjs, onSelectEvent, storePromotionObj }: CalendarP
         }
         return () => handleCheckPositionScrollTop.cancel()
     }, [])
-
-    const [currentDate, setCurrentDate] = useState<Date>(new Date())
 
     const dayInWeek = useMemo(
         () =>
@@ -65,9 +65,9 @@ const Calendar = ({ promotionObjs, onSelectEvent, storePromotionObj }: CalendarP
     const handleChangeDate = (type: 'previous' | 'next') => () => {
         setCurrentDate((pre) => {
             if (type === 'previous') {
-                return startOfDay(sub(pre, { days: 4 }))
+                return startOfWeek(sub(pre, { days: 10 }), { weekStartsOn: 1 })
             }
-            return startOfDay(add(pre, { days: 4 }))
+            return endOfWeek(add(pre, { days: 10 }), { weekStartsOn: 1 })
         })
     }
 

@@ -52,7 +52,7 @@ const ForgetPassword = () => {
         mutationFn: authFetching.submitOTP,
         onSuccess: () => {
             toast.success('Khôi phục mật khẩu thành công. Vui lòng đăng nhập lại')
-            navigate('login', { replace: true })
+            navigate('/login', { replace: true })
         },
         onError: (error) => {
             if (isAxiosError(error)) {

@@ -10,11 +10,17 @@ import { Status } from 'common/enums/status.enum'
 import { CronJob } from 'cron'
 import {
     add,
+    eachDayOfInterval,
     eachHourOfInterval,
+    endOfDay,
     endOfHour,
     endOfWeek,
     format,
+    getDate,
+    getDay,
+    getMonth,
     setDefaultOptions,
+    startOfDay,
     startOfHour,
     startOfWeek,
     sub
@@ -34,9 +40,9 @@ export class ScheduleService {
         @Inject('SOCKET_SERVICE') private readonly socket_client: ClientProxy
     ) {}
 
-    calDate() {
+    calDate(payload: Date) {
         let start = add(
-            startOfWeek(new Date(), {
+            startOfWeek(payload, {
                 weekStartsOn: 1
             }),
             {
@@ -44,26 +50,37 @@ export class ScheduleService {
             }
         )
         let end = add(
-            endOfWeek(new Date(), {
+            endOfWeek(payload, {
                 weekStartsOn: 1
             }),
             {
                 hours: 7
             }
         )
-        return eachHourOfInterval({ start, end })
+        let tmp: Date[] = []
+        eachDayOfInterval({ start, end }).forEach((day) => {
+            let dayInMonth = getDate(day)
+            let month = getMonth(day) + 1
+            if (month === dayInMonth) {
+                tmp.push(day)
+                return
+            }
+            let hours = eachHourOfInterval({ start: startOfDay(day), end: endOfDay(day) })
+            tmp.push(...hours)
+        })
+        return tmp
     }
 
-    @Cron('1 58 * * * 1', {
+    @Cron('1 18 * * * 1', {
         name: 'auto creating sale promotion'
     })
     async autoCreatingSalePromotion() {
-        let tmp = this.calDate()
+        let tmp = this.calDate(new Date('08/06/2024'))
         chunk(tmp, 24).map((dates, idx) => this.createSalePromotion(uuidv4(), 4 * idx, dates))
     }
 
     async createSalePromotion(name: string, second: number, data: Date[]) {
-        const cron_job = new CronJob(`${second} 59 * * * 1`, async () => {
+        const cron_job = new CronJob(`${second} 19 * * * 1`, async () => {
             await Promise.all(
                 data.map((date) => {
                     let formatDate = format(sub(date, { hours: 7 }), 'HH:mm dd-MM-yyyy')

@@ -1,3 +1,4 @@
+import loadable from '@loadable/component'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { add, startOfDay } from 'date-fns'
 import { Dictionary, keyBy } from 'lodash'
@@ -11,9 +12,8 @@ import { AppContext } from 'src/contexts/AppContext'
 import { Store } from 'src/types/auth.type'
 import { ProductQueryAndPagination } from 'src/types/product.type'
 import { ProductSaleMix, SalePromotion, UpdateProductSaleBody } from 'src/types/sale.type'
-import loadable from '@loadable/component'
 
-const Calendar = loadable(() => import('./CalendarEvent'))
+const CalendarEvent = loadable(() => import('./CalendarEvent'))
 const SaleAlert = loadable(() => import('./SaleAlert'))
 
 const default_seach = { limit: import.meta.env.VITE_LIMIT, status: Status.active }
@@ -57,6 +57,7 @@ const FlashSale = () => {
     const [category, setCategory] = useState<string>()
     const [search_key, setSearch_key] = useState<string>('')
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+    const [currentDate, setCurrentDate] = useState<Date>(new Date())
 
     const { data: productList, refetch: productListRefetch } = useQuery({
         queryKey: ['productList', query],
@@ -117,7 +118,7 @@ const FlashSale = () => {
 
     const { data, refetch: refetchSalePromotion } = useQuery({
         queryKey: ['salePromotion'],
-        queryFn: () => sale_api.getSalePromotion(add(startOfDay(new Date()), { hours: 7 }).toISOString()),
+        queryFn: () => sale_api.getSalePromotion(add(startOfDay(currentDate), { hours: 7 }).toISOString()),
         select: (data) => ({
             promotionObjs: keyBy(data.data.result.promotions, (e) => e.startDate),
             storePromotionObj: keyBy(data.data.result.storePromotions, 'salePromotionId')
@@ -202,12 +203,18 @@ const FlashSale = () => {
         }
     }, [search_key])
 
+    useEffect(() => {
+        refetchSalePromotion()
+    }, [currentDate])
+
     return (
         <>
-            <Calendar
+            <CalendarEvent
                 promotionObjs={data?.promotionObjs || {}}
                 onSelectEvent={onSelectEvent}
                 storePromotionObj={data?.storePromotionObj || {}}
+                currentDate={currentDate}
+                setCurrentDate={setCurrentDate}
             />
             <SaleAlert
                 valueRef={valueRef}

@@ -455,20 +455,6 @@ const SaleAlert = ({
                                     Trở về
                                 </Button>
                             </AlertDialog.Cancel>
-                            {/* <Button
-                                onClick={
-                                    tab === 2
-                                        ? handleUpdateProduct
-                                        : handleJoin(storePromotionObj?.[selectedEvent?.event?.id as any]?.id)
-                                }
-                                variant='solid'
-                                className='bg-blue text-white'
-                                color='blue'
-                                size={'3'}
-                            >
-                                {isPending && <Spinner />}
-                                {tab === 2 ? 'Cập nhật' : 'Tham gia'}
-                            </Button> */}
                             {tab === 2 && (
                                 <Button
                                     onClick={

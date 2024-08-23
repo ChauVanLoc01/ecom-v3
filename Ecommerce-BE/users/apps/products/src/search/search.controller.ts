@@ -41,7 +41,8 @@ export class SearchController {
     async scrollInfinity(@Query() queryBody: ScrollInfinityDTO): Promise<Return> {
         try {
             const { scroll, query, scroll_id } = queryBody
-
+            let tmp = new Set<string>()
+            let result = []
             if (!scroll_id) {
                 const { body } = await this.searchService.search<ProductSearchResult>({
                     scroll,
@@ -61,17 +62,15 @@ export class SearchController {
                     }
                 })
 
-                let tmp = new Set<string>()
-                let result = []
                 body.hits.hits.forEach((item, idx) => {
                     if (!idx) {
                         tmp.add(item._source.name)
-                        result.push(item)
+                        result.push(item._source)
                         return
                     }
                     let check = tmp.has(item._source.name)
                     if (!check) {
-                        result.push(item)
+                        result.push(item._source)
                     }
                 })
 
@@ -96,17 +95,15 @@ export class SearchController {
                 })
             }
 
-            let tmp = new Set<string>()
-            let result = []
             body.hits.hits.forEach((item, idx) => {
                 if (!idx) {
                     tmp.add(item._source.name)
-                    result.push(item)
+                    result.push(item._source)
                     return
                 }
                 let check = tmp.has(item._source.name)
                 if (!check) {
-                    result.push(item)
+                    result.push(item._source)
                 }
             })
 
