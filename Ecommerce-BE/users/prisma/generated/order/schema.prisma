@@ -1,0 +1,143 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./generated/order"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_ORDER")
+}
+
+model Order {
+  id             String          @id @db.VarChar(50)
+  userId         String          @db.VarChar(50)
+  storeId        String          @db.VarChar(50)
+  total          Float           @db.Float
+  discount       Float?          @db.Float
+  pay            Float           @db.Float
+  note           String?         @db.VarChar(200)
+  isRated        Boolean?        @default(false)
+  status         String          @db.Char(50)
+  createdAt      DateTime        @db.Timestamp(0)
+  updatedAt      DateTime?       @db.Timestamp(0)
+  numberOfRefund Int?            @default(3)
+  isDraf         Boolean?        @default(true)
+  complainId     String?         @db.VarChar(50)
+  payment        String?         @db.VarChar(50)
+  OrderFlow      OrderFlow[]
+  OrderRefund    OrderRefund[]
+  OrderShipping  OrderShipping[]
+  OrderVoucher   OrderVoucher[]
+  ProductOrder   ProductOrder[]
+
+  @@index([isDraf], map: "isDraf")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([userId], map: "userId")
+}
+
+model OrderFlow {
+  id            String    @id @db.VarChar(50)
+  status        String    @db.VarChar(50)
+  note          String?   @db.Text
+  createdBy     String    @db.VarChar(50)
+  createdAt     DateTime? @db.Timestamp(0)
+  orderId       String    @db.VarChar(50)
+  orderRefundId String?   @db.VarChar(50)
+  Order         Order     @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "OrderFlow_ibfk_2")
+
+  @@index([createdBy], map: "createdBy")
+  @@index([orderId], map: "orderId")
+  @@index([orderRefundId], map: "orderRefundId")
+  @@index([status], map: "status")
+}
+
+model OrderRefund {
+  id                 String               @id @db.VarChar(50)
+  orderId            String               @db.VarChar(50)
+  status             String               @db.VarChar(50)
+  title              String               @db.VarChar(1000)
+  description        String               @db.TinyText
+  createdAt          DateTime?            @db.Timestamp(0)
+  createdBy          String               @db.VarChar(50)
+  updatedAt          DateTime?            @db.Timestamp(0)
+  updatedBy          String?              @db.VarChar(50)
+  Order              Order                @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "OrderRefund_ibfk_1")
+  ProductOrderRefund ProductOrderRefund[]
+  RefundMaterial     RefundMaterial[]
+
+  @@index([createdBy], map: "createdBy")
+  @@index([orderId], map: "orderId")
+  @@index([status], map: "status")
+}
+
+model OrderShipping {
+  id        String    @id @db.VarChar(50)
+  orderId   String    @db.VarChar(50)
+  name      String    @db.VarChar(100)
+  address   String    @db.VarChar(1000)
+  type      String    @db.VarChar(50)
+  createdAt DateTime? @db.Timestamp(0)
+  createdBy String    @db.VarChar(50)
+  updatedAt DateTime? @db.Timestamp(0)
+  Order     Order     @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "OrderShipping_ibfk_1")
+
+  @@index([createdBy], map: "createdBy")
+  @@index([orderId], map: "orderId")
+}
+
+model OrderVoucher {
+  id        String   @id @db.VarChar(50)
+  orderId   String   @db.VarChar(50)
+  voucherId String   @db.VarChar(50)
+  createdAt DateTime @db.Timestamp(0)
+  Order     Order    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "OrderVoucher_ibfk_1")
+
+  @@index([orderId], map: "orderId")
+  @@index([voucherId], map: "voucherId")
+}
+
+model ProductOrder {
+  id                 String               @id @db.VarChar(50)
+  productId          String               @db.VarChar(50)
+  quantity           Int
+  priceBefore        Float?               @db.Float
+  priceAfter         Float                @db.Float
+  orderId            String               @db.VarChar(50)
+  Order              Order                @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ProductOrder_ibfk_2")
+  ProductOrderRefund ProductOrderRefund[]
+
+  @@index([orderId], map: "orderId")
+  @@index([productId], map: "productId")
+}
+
+model ProductOrderRefund {
+  id             String       @id @db.VarChar(50)
+  orderRefundId  String       @db.VarChar(50)
+  productOrderId String       @db.VarChar(50)
+  quantity       Int
+  description    String?      @db.Text
+  OrderRefund    OrderRefund  @relation(fields: [orderRefundId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ProductOrderRefund_ibfk_1")
+  ProductOrder   ProductOrder @relation(fields: [productOrderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ProductOrderRefund_ibfk_2")
+
+  @@index([orderRefundId], map: "orderRefundId")
+  @@index([productOrderId], map: "productOrderId")
+}
+
+model RefundMaterial {
+  id            String      @id @db.VarChar(50)
+  orderRefundId String      @db.VarChar(50)
+  url           String      @db.VarChar(500)
+  type          String      @db.VarChar(50)
+  description   String?     @db.TinyText
+  OrderRefund   OrderRefund @relation(fields: [orderRefundId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "RefundMaterial_ibfk_1")
+
+  @@index([orderRefundId], map: "orderRefundId")
+}
+
+model RequestComplain {
+  id          String   @id @db.VarChar(50)
+  description String   @db.TinyText
+  createdAt   DateTime @db.Timestamp(0)
+}

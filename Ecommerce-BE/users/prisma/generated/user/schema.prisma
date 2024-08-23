@@ -1,0 +1,108 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./generated/user"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_USER")
+}
+
+model Account {
+  username                     String     @id @db.VarChar(100)
+  password                     String     @db.VarChar(255)
+  userId                       String     @db.VarChar(50)
+  storeRoleId                  String?    @db.VarChar(50)
+  createdBy                    String?    @db.VarChar(50)
+  updatedBy                    String?    @db.VarChar(50)
+  createdAt                    DateTime?  @default(now()) @db.Timestamp(0)
+  updatedAt                    DateTime?  @db.Timestamp(0)
+  User_Account_userIdToUser    User       @relation("Account_userIdToUser", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Account_ibfk_1")
+  User_Account_createdByToUser User?      @relation("Account_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Account_ibfk_2")
+  User_Account_updatedByToUser User?      @relation("Account_updatedByToUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Account_ibfk_3")
+  StoreRole                    StoreRole? @relation(fields: [storeRoleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Account_ibfk_4")
+
+  @@index([createdBy], map: "createdBy")
+  @@index([storeRoleId], map: "storeRoleId")
+  @@index([updatedBy], map: "updatedBy")
+  @@index([userId], map: "userId")
+}
+
+model Permission {
+  id                              String    @id @db.VarChar(50)
+  instance                        String    @db.VarChar(50)
+  permission                      String    @db.VarChar(50)
+  userId                          String    @db.VarChar(50)
+  createdAt                       DateTime? @db.Timestamp(0)
+  createdBy                       String    @db.VarChar(50)
+  updatedAt                       DateTime? @db.Timestamp(0)
+  updatedBy                       String?   @db.VarChar(50)
+  User_Permission_userIdToUser    User      @relation("Permission_userIdToUser", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Permission_ibfk_1")
+  User_Permission_createdByToUser User      @relation("Permission_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Permission_ibfk_2")
+
+  @@index([createdBy], map: "createdBy")
+  @@index([instance], map: "instance")
+  @@index([permission], map: "permission")
+  @@index([userId], map: "userId")
+}
+
+model StoreRole {
+  id                             String    @id @db.VarChar(50)
+  storeId                        String    @db.VarChar(50)
+  status                         String    @db.VarChar(10)
+  role                           String    @db.VarChar(20)
+  createdBy                      String    @db.VarChar(50)
+  updatedBy                      String?   @db.VarChar(50)
+  createdAt                      DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt                      DateTime? @db.Timestamp(0)
+  Account                        Account[]
+  User_StoreRole_createdByToUser User      @relation("StoreRole_createdByToUser", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "StoreRole_ibfk_2")
+  User_StoreRole_updatedByToUser User?     @relation("StoreRole_updatedByToUser", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "StoreRole_ibfk_3")
+
+  @@index([createdBy], map: "createdBy")
+  @@index([role], map: "role")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([updatedBy], map: "updatedBy")
+}
+
+model User {
+  id                                    String                @id @db.VarChar(50)
+  image                                 String?               @db.Text
+  full_name                             String                @db.VarChar(100)
+  birthday                              DateTime?             @db.Timestamp(0)
+  email                                 String                @db.VarChar(255)
+  address                               String?               @db.Text
+  rankId                                String?               @db.VarChar(50)
+  role                                  String                @db.VarChar(20)
+  status                                String                @db.VarChar(10)
+  createdAt                             DateTime?             @default(now()) @db.Timestamp(0)
+  updatedAt                             DateTime?             @db.Timestamp(0)
+  Account_Account_userIdToUser          Account[]             @relation("Account_userIdToUser")
+  Account_Account_createdByToUser       Account[]             @relation("Account_createdByToUser")
+  Account_Account_updatedByToUser       Account[]             @relation("Account_updatedByToUser")
+  DeliveryInformation                   DeliveryInformation[]
+  Permission_Permission_userIdToUser    Permission[]          @relation("Permission_userIdToUser")
+  Permission_Permission_createdByToUser Permission[]          @relation("Permission_createdByToUser")
+  StoreRole_StoreRole_createdByToUser   StoreRole[]           @relation("StoreRole_createdByToUser")
+  StoreRole_StoreRole_updatedByToUser   StoreRole[]           @relation("StoreRole_updatedByToUser")
+
+  @@index([email], map: "email")
+  @@index([full_name], map: "full_name")
+  @@index([status], map: "status")
+}
+
+model DeliveryInformation {
+  id        String    @id @db.VarChar(100)
+  full_name String    @db.VarChar(100)
+  phone     String    @db.VarChar(12)
+  address   String    @db.VarChar(500)
+  isPrimary Boolean   @default(false)
+  userId    String    @db.VarChar(50)
+  createdAt DateTime? @db.Timestamp(0)
+  isDelete  Boolean   @default(false)
+  User      User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "DeliveryInformation_ibfk_1")
+
+  @@index([userId], map: "userId")
+}

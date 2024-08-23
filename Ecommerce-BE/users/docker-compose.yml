@@ -1,0 +1,125 @@
+version: '3.8'
+services:
+    user_mysql:
+        image: mysql
+        container_name: user_mysql
+        restart: unless-stopped
+        volumes:
+            - user_mysql_data:/var/lib/mysql
+        ports:
+            - 3301:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=123123
+            - MYSQL_DATABASE=microservice
+            - MYSQL_USER=vanloc
+            - MYSQL_PASSWORD=123123
+        networks:
+            - kong-net
+    product_mysql:
+        image: mysql
+        container_name: product_mysql
+        restart: unless-stopped
+        volumes:
+            - product_mysql_data:/var/lib/mysql
+        ports:
+            - 3302:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=123123
+            - MYSQL_DATABASE=microservice
+            - MYSQL_USER=vanloc
+            - MYSQL_PASSWORD=123123
+        networks:
+            - kong-net
+    order_mysql:
+        image: mysql
+        container_name: order_mysql
+        restart: unless-stopped
+        volumes:
+            - order_mysql_data:/var/lib/mysql
+        ports:
+            - 3304:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=123123
+            - MYSQL_DATABASE=microservice
+            - MYSQL_USER=vanloc
+            - MYSQL_PASSWORD=123123
+        networks:
+            - kong-net
+    store_mysql:
+        image: mysql
+        container_name: store_mysql
+        restart: unless-stopped
+        volumes:
+            - store_mysql_data:/var/lib/mysql
+        ports:
+            - 3303:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=123123
+            - MYSQL_DATABASE=microservice
+            - MYSQL_USER=vanloc
+            - MYSQL_PASSWORD=123123
+        networks:
+            - kong-net
+    rabbitmq:
+        container_name: rabbitmq1
+        image: rabbitmq:3-management
+        restart: unless-stopped
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
+        ports:
+            - 5700:5672
+            - 17000:15672
+        environment:
+            - RABBITMQ_DEFAULT_USER=vanloc
+            - RABBITMQ_DEFAULT_PASS=123123
+        networks:
+            - kong-net
+    redis:
+        container_name: redis1
+        image: redis
+        restart: unless-stopped
+        volumes:
+            - redis_data:/data
+        ports:
+            - 6400:6379
+        networks:
+            - kong-net
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+        container_name: elasticsearch
+        environment:
+            - node.name=elasticsearch
+            - cluster.name=es-docker-cluster
+            - bootstrap.memory_lock=true
+            - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+            - 'discovery.type=single-node'
+            - ELASTIC_PASSWORD=123123
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - es01_data:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+        networks:
+            - kong-net
+    adminer:
+        image: adminer
+        restart: unless-stopped
+        ports:
+            - 8080:8080
+        networks:
+            - kong-net
+networks:
+    kong-net:
+        driver: bridge
+volumes:
+    user_mysql_data:
+    product_mysql_data:
+    order_mysql_data:
+    store_mysql_data:
+    rabbitmq_data:
+    redis_data:
+    es01_data:
+    kong-data:

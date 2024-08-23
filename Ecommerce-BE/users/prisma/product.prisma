@@ -1,0 +1,93 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+  output   = "./generated/product"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_PRODUCT")
+}
+
+model Category {
+  shortname   String    @id @db.VarChar(50)
+  name        String    @db.VarChar(255)
+  description String?   @db.Text
+  Product     Product[]
+}
+
+model Product {
+  id                   String                 @id @db.VarChar(50)
+  name                 String                 @db.Text
+  image                String                 @db.Text
+  priceBefore          Float                  @db.Float
+  priceAfter           Float?                 @db.Float
+  initQuantity         Int
+  currentQuantity      Int
+  sold                 Int                    @default(0)
+  description          String?                @db.Text
+  status               String                 @db.VarChar(20)
+  category             String?                @db.VarChar(50)
+  createdBy            String                 @db.VarChar(50)
+  updatedBy            String?                @db.VarChar(50)
+  createdAt            DateTime?              @default(now()) @db.Timestamp(0)
+  updatedAt            DateTime?              @db.Timestamp(0)
+  deletedBy            String?                @db.VarChar(50)
+  deletedAt            DateTime?              @db.Timestamp(0)
+  storeId              String                 @db.VarChar(50)
+  voucherId            String?                @db.VarChar(50)
+  rate                 Float                  @default(0)
+  isDelete             Boolean?               @default(false)
+  Category             Category?              @relation(fields: [category], references: [shortname], onDelete: NoAction, onUpdate: NoAction, map: "Product_ibfk_1")
+  ProductImage         ProductImage[]
+  UserAddProductToCart UserAddProductToCart[]
+  UserViewProduct      UserViewProduct[]
+
+  @@index([category], map: "category")
+  @@index([createdBy], map: "createdBy")
+  @@index([deletedBy], map: "deletedBy")
+  @@index([status], map: "status")
+  @@index([storeId], map: "storeId")
+  @@index([updatedBy], map: "updatedBy")
+  @@index([voucherId], map: "voucherId")
+}
+
+model ProductImage {
+  id        String    @id @db.VarChar(50)
+  productId String    @db.VarChar(50)
+  url       String    @db.TinyText
+  createdBy String    @db.VarChar(50)
+  createdAt DateTime? @db.Timestamp(0)
+  Product   Product   @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ProductImage_ibfk_2")
+
+  @@index([createdBy], map: "createdBy")
+  @@index([productId], map: "productId")
+}
+
+model UserAddProductToCart {
+  id        String    @id @db.VarChar(50)
+  userId    String?   @db.VarChar(50)
+  productId String    @db.VarChar(50)
+  quantity  Int
+  createdAt DateTime  @db.Timestamp(0)
+  updatedAt DateTime? @db.Timestamp(0)
+  isDelete  Int?      @db.TinyInt
+  Product   Product   @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserAddProductToCart_ibfk_2")
+
+  @@index([productId], map: "productId")
+  @@index([userId], map: "userId")
+}
+
+model UserViewProduct {
+  id        String   @id @db.VarChar(50)
+  userId    String?  @db.VarChar(50)
+  productId String   @db.VarChar(50)
+  storeId   String   @db.VarChar(50)
+  createdAt DateTime @db.Timestamp(0)
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserViewProduct_ibfk_2")
+
+  @@index([productId], map: "productId")
+  @@index([storeId], map: "storeId")
+  @@index([userId], map: "userId")
+}

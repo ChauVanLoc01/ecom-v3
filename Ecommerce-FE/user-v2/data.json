@@ -1,0 +1,69 @@
+{
+    "a": {
+        "url": "/basso/customer_order/create",
+        "res_GET": [],
+        "res_POST": {
+            "customer": "{\"id\":\"8174\",\"name\":\"Dung Nguy\u1ec5n\",\"phone\":\"0981543095\",\"shipping_address\":\"nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN\",\"email\":\"dungnguyen301195@gmail.com\",\"note\":null,\"order_place_id\":\"1\",\"city_id\":1,\"district_id\":\"128\",\"errors\":[]}",
+            "items": "[{\"name\":\"ULTRABOOST LIGHT RUNNING SHOES\",\"quantity\":1,\"link\":\"https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html\",\"website\":\"adidas.com\",\"variations\":\"[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]\",\"note\":\"Gh\u00e9p code 30%\",\"tracking_code\":\"\",\"term_id\":\"5\",\"term_fee\":\"0\",\"price\":\"46.9\",\"status\":\"pending\",\"requirement\":\"pending\",\"image_path\":\"/uploads/2024/04/25/image14.png\",\"image_id\":\"168258\"}]",
+            "payment": "{\"created_time\":\"25-04-2024 15:37\",\"amount\":0,\"type\":\"transfer\",\"bank_id\":null}",
+            "order": "{\"country_id\":\"1\",\"shipping_fee\":0,\"total\":46.9,\"sub_total\":1195950,\"created_time\":\"25-04-2024 15:37\",\"status\":\"processing\",\"currency_symbol\":\"$\",\"customer_rate\":25500,\"brand\":\"shipus\",\"branch\":\"ha-noi\",\"website\":\"adidas.com\",\"web_shipping_fee\":\"0\",\"world_shipping_fee\":220000,\"errors\":[]}"
+        },
+        "user_id": "4270",
+        "SQL": {
+            "5": "UPDATE `images` SET `active` = 1\nWHERE `id` = '168258'",
+            "7": "INSERT INTO `customer_orders` (`created_time`, `branch`, `customer_id`, `name`, `phone`, `email`, `shipping_address`, `city_id`, `district_id`, `order_place_id`, `country_id`, `currency_rate`, `currency_symbol`, `discount_code`, `discount_total`, `discount_type`, `discount_max`, `discount_amount`, `web_shipping_fee`, `status`, `total`, `sub_total`, `website`, `payment_status`, `brand`, `shipping_status`, `user_id`, `order_code`, `approve_user_id`, `world_shipping_fee`, `total_weight`, `payment_method`, `quantity`, `note`, `first_total_deposit`, `first_total_limit`, `profit`) VALUES (1714034220, 'ha-noi', '8174', 'Dung Nguy\u1ec5n', '0981543095', 'dungnguyen301195@gmail.com', 'nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN', 1, '128', '1', '1', 25500, '$', NULL, 0, NULL, 0, 0, 0, 'processing', 46.9, 1195950, 'adidas.com', 'no_payment', 'shipus', 'none', '4270', 'SU25042428', '4270', 220000, 0, NULL, 0, NULL, 0, 0, 0)",
+            "8": "INSERT INTO `customer_order_items` (`created_time`, `image_id`, `link`, `name`, `note`, `order_id`, `price`, `quantity`, `requirement`, `shipping_fee`, `skuSub`, `status`, `term_fee`, `term_id`, `variations`, `web_shipping_fee`, `website`, `weight`) VALUES (1714034335,'168258','https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html','ULTRABOOST LIGHT RUNNING SHOES','Gh\u00e9p code 30%',78917,'46.9',1,'buy_now',0,'','pending',0,'5','[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]',0,'adidas.com',NULL)"
+        }
+    },
+    "b": {
+        "url": "/basso/customer_order/create",
+        "res_GET": [],
+        "res_POST": {
+            "customer": "{\"id\":\"8174\",\"name\":\"Dung Nguy\u1ec5n\",\"phone\":\"0981543095\",\"shipping_address\":\"nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN\",\"email\":\"dungnguyen301195@gmail.com\",\"note\":null,\"order_place_id\":\"1\",\"city_id\":1,\"district_id\":\"128\",\"errors\":[]}",
+            "items": "[{\"name\":\"ULTRABOOST LIGHT RUNNING SHOES\",\"quantity\":1,\"link\":\"https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html\",\"website\":\"adidas.com\",\"variations\":\"[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]\",\"note\":\"Gh\u00e9p code 30%\",\"tracking_code\":\"\",\"term_id\":\"5\",\"term_fee\":\"0\",\"price\":\"46.9\",\"status\":\"pending\",\"requirement\":\"pending\",\"image_path\":\"/uploads/2024/04/25/image14.png\",\"image_id\":\"168258\"}]",
+            "payment": "{\"created_time\":\"25-04-2024 15:37\",\"amount\":0,\"type\":\"transfer\",\"bank_id\":null}",
+            "order": "{\"country_id\":\"1\",\"shipping_fee\":0,\"total\":46.9,\"sub_total\":1195950,\"created_time\":\"25-04-2024 15:37\",\"status\":\"processing\",\"currency_symbol\":\"$\",\"customer_rate\":25500,\"brand\":\"shipus\",\"branch\":\"ha-noi\",\"website\":\"adidas.com\",\"web_shipping_fee\":\"0\",\"world_shipping_fee\":220000,\"errors\":[]}"
+        },
+        "user_id": "4270",
+        "SQL": {
+            "5": "UPDATE `images` SET `active` = 1\nWHERE `id` = '168258'",
+            "7": "INSERT INTO `customer_orders` (`created_time`, `branch`, `customer_id`, `name`, `phone`, `email`, `shipping_address`, `city_id`, `district_id`, `order_place_id`, `country_id`, `currency_rate`, `currency_symbol`, `discount_code`, `discount_total`, `discount_type`, `discount_max`, `discount_amount`, `web_shipping_fee`, `status`, `total`, `sub_total`, `website`, `payment_status`, `brand`, `shipping_status`, `user_id`, `order_code`, `approve_user_id`, `world_shipping_fee`, `total_weight`, `payment_method`, `quantity`, `note`, `first_total_deposit`, `first_total_limit`, `profit`) VALUES (1714034220, 'ha-noi', '8174', 'Dung Nguy\u1ec5n', '0981543095', 'dungnguyen301195@gmail.com', 'nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN', 1, '128', '1', '1', 25500, '$', NULL, 0, NULL, 0, 0, 0, 'processing', 46.9, 1195950, 'adidas.com', 'no_payment', 'shipus', 'none', '4270', 'SU25042428', '4270', 220000, 0, NULL, 0, NULL, 0, 0, 0)",
+            "8": "INSERT INTO `customer_order_items` (`created_time`, `image_id`, `link`, `name`, `note`, `order_id`, `price`, `quantity`, `requirement`, `shipping_fee`, `skuSub`, `status`, `term_fee`, `term_id`, `variations`, `web_shipping_fee`, `website`, `weight`) VALUES (1714034335,'168258','https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html','ULTRABOOST LIGHT RUNNING SHOES','Gh\u00e9p code 30%',78917,'46.9',1,'buy_now',0,'','pending',0,'5','[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]',0,'adidas.com',NULL)"
+        }
+    },
+    "c": {
+        "url": "/basso/customer_order/create",
+        "res_GET": [],
+        "res_POST": {
+            "customer": "{\"id\":\"8174\",\"name\":\"Dung Nguy\u1ec5n\",\"phone\":\"0981543095\",\"shipping_address\":\"nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN\",\"email\":\"dungnguyen301195@gmail.com\",\"note\":null,\"order_place_id\":\"1\",\"city_id\":1,\"district_id\":\"128\",\"errors\":[]}",
+            "items": "[{\"name\":\"ULTRABOOST LIGHT RUNNING SHOES\",\"quantity\":1,\"link\":\"https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html\",\"website\":\"adidas.com\",\"variations\":\"[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]\",\"note\":\"Gh\u00e9p code 30%\",\"tracking_code\":\"\",\"term_id\":\"5\",\"term_fee\":\"0\",\"price\":\"46.9\",\"status\":\"pending\",\"requirement\":\"pending\",\"image_path\":\"/uploads/2024/04/25/image14.png\",\"image_id\":\"168258\"}]",
+            "payment": "{\"created_time\":\"25-04-2024 15:37\",\"amount\":0,\"type\":\"transfer\",\"bank_id\":null}",
+            "order": "{\"country_id\":\"1\",\"shipping_fee\":0,\"total\":46.9,\"sub_total\":1195950,\"created_time\":\"25-04-2024 15:37\",\"status\":\"processing\",\"currency_symbol\":\"$\",\"customer_rate\":25500,\"brand\":\"shipus\",\"branch\":\"ha-noi\",\"website\":\"adidas.com\",\"web_shipping_fee\":\"0\",\"world_shipping_fee\":220000,\"errors\":[]}"
+        },
+        "user_id": "4270",
+        "SQL": {
+            "5": "UPDATE `images` SET `active` = 1\nWHERE `id` = '168258'",
+            "7": "INSERT INTO `customer_orders` (`created_time`, `branch`, `customer_id`, `name`, `phone`, `email`, `shipping_address`, `city_id`, `district_id`, `order_place_id`, `country_id`, `currency_rate`, `currency_symbol`, `discount_code`, `discount_total`, `discount_type`, `discount_max`, `discount_amount`, `web_shipping_fee`, `status`, `total`, `sub_total`, `website`, `payment_status`, `brand`, `shipping_status`, `user_id`, `order_code`, `approve_user_id`, `world_shipping_fee`, `total_weight`, `payment_method`, `quantity`, `note`, `first_total_deposit`, `first_total_limit`, `profit`) VALUES (1714034220, 'ha-noi', '8174', 'Dung Nguy\u1ec5n', '0981543095', 'dungnguyen301195@gmail.com', 'nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN', 1, '128', '1', '1', 25500, '$', NULL, 0, NULL, 0, 0, 0, 'processing', 46.9, 1195950, 'adidas.com', 'no_payment', 'shipus', 'none', '4270', 'SU25042428', '4270', 220000, 0, NULL, 0, NULL, 0, 0, 0)",
+            "8": "INSERT INTO `customer_order_items` (`created_time`, `image_id`, `link`, `name`, `note`, `order_id`, `price`, `quantity`, `requirement`, `shipping_fee`, `skuSub`, `status`, `term_fee`, `term_id`, `variations`, `web_shipping_fee`, `website`, `weight`) VALUES (1714034335,'168258','https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html','ULTRABOOST LIGHT RUNNING SHOES','Gh\u00e9p code 30%',78917,'46.9',1,'buy_now',0,'','pending',0,'5','[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]',0,'adidas.com',NULL)",
+            "10": "INSERT INTO `system_logs` (`created_time`, `controller`, `action`, `content`, `object_id`) VALUES (1714034335, 'customer_order', 'create', 'Minh t\u1ea1o \u0111\u01a1n h\u00e0ng', 78917)"
+        }
+    },
+    "d": {
+        "url": "/basso/customer_order/create",
+        "res_GET": [],
+        "res_POST": {
+            "customer": "{\"id\":\"8174\",\"name\":\"Dung Nguy\u1ec5n\",\"phone\":\"0981543095\",\"shipping_address\":\"nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN\",\"email\":\"dungnguyen301195@gmail.com\",\"note\":null,\"order_place_id\":\"1\",\"city_id\":1,\"district_id\":\"128\",\"errors\":[]}",
+            "items": "[{\"name\":\"ULTRABOOST LIGHT RUNNING SHOES\",\"quantity\":1,\"link\":\"https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html\",\"website\":\"adidas.com\",\"variations\":\"[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]\",\"note\":\"Gh\u00e9p code 30%\",\"tracking_code\":\"\",\"term_id\":\"5\",\"term_fee\":\"0\",\"price\":\"46.9\",\"status\":\"pending\",\"requirement\":\"pending\",\"image_path\":\"/uploads/2024/04/25/image14.png\",\"image_id\":\"168258\"}]",
+            "payment": "{\"created_time\":\"25-04-2024 15:37\",\"amount\":0,\"type\":\"transfer\",\"bank_id\":null}",
+            "order": "{\"country_id\":\"1\",\"shipping_fee\":0,\"total\":46.9,\"sub_total\":1195950,\"created_time\":\"25-04-2024 15:37\",\"status\":\"processing\",\"currency_symbol\":\"$\",\"customer_rate\":25500,\"brand\":\"shipus\",\"branch\":\"ha-noi\",\"website\":\"adidas.com\",\"web_shipping_fee\":\"0\",\"world_shipping_fee\":220000,\"errors\":[]}"
+        },
+        "user_id": "4270",
+        "SQL": {
+            "5": "UPDATE `images` SET `active` = 1\nWHERE `id` = '168258'",
+            "7": "INSERT INTO `customer_orders` (`created_time`, `branch`, `customer_id`, `name`, `phone`, `email`, `shipping_address`, `city_id`, `district_id`, `order_place_id`, `country_id`, `currency_rate`, `currency_symbol`, `discount_code`, `discount_total`, `discount_type`, `discount_max`, `discount_amount`, `web_shipping_fee`, `status`, `total`, `sub_total`, `website`, `payment_status`, `brand`, `shipping_status`, `user_id`, `order_code`, `approve_user_id`, `world_shipping_fee`, `total_weight`, `payment_method`, `quantity`, `note`, `first_total_deposit`, `first_total_limit`, `profit`) VALUES (1714034220, 'ha-noi', '8174', 'Dung Nguy\u1ec5n', '0981543095', 'dungnguyen301195@gmail.com', 'nh\u00e0 v\u0103n ho\u00e1 th\u00f4n \u0110\u00f4ng H\u1ea1- Nam S\u01a1n- s\u00f3c s\u01a1n- HN', 1, '128', '1', '1', 25500, '$', NULL, 0, NULL, 0, 0, 0, 'processing', 46.9, 1195950, 'adidas.com', 'no_payment', 'shipus', 'none', '4270', 'SU25042428', '4270', 220000, 0, NULL, 0, NULL, 0, 0, 0)",
+            "8": "INSERT INTO `customer_order_items` (`created_time`, `image_id`, `link`, `name`, `note`, `order_id`, `price`, `quantity`, `requirement`, `shipping_fee`, `skuSub`, `status`, `term_fee`, `term_id`, `variations`, `web_shipping_fee`, `website`, `weight`) VALUES (1714034335,'168258','https://www.adidas.com/us/ultraboost-light-running-shoes/GY9351.html','ULTRABOOST LIGHT RUNNING SHOES','Gh\u00e9p code 30%',78917,'46.9',1,'buy_now',0,'','pending',0,'5','[{\\\"name\\\":\\\"Size\\\",\\\"value\\\":\\\"7.5\\\"},{\\\"name\\\":\\\"Color\\\",\\\"value\\\":\\\"Core Black / Core Black / Crystal White\\\"}]',0,'adidas.com',NULL)",
+            "10": "INSERT INTO `system_logs` (`created_time`, `controller`, `action`, `content`, `object_id`) VALUES (1714034335, 'customer_order', 'create', 'Minh t\u1ea1o \u0111\u01a1n h\u00e0ng', 78917)",
+            "11": "INSERT INTO `system_logs` (`created_time`, `controller`, `action`, `content`, `object_id`) VALUES (1714034335, 'customer_order', 'create', 'Minh duy\u1ec7t \u0111\u01a1n h\u00e0ng', 78917)"
+        }
+    }
+}

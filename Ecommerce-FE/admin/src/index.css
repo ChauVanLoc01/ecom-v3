@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+
+    --primary: 220.9 39.3% 11%;
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 224 71.4% 4.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 210 20% 98%;
+    --primary-foreground: 220.9 39.3% 11%;
+
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 216 12.2% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  --_g1: no-repeat radial-gradient(farthest-side, #f5222d 90%, rgb(100 116 139 / 0));
+  --_g2: no-repeat radial-gradient(farthest-side, #1677ff 90%, rgb(100 116 139 / 0));
+  --_g3: no-repeat radial-gradient(farthest-side, #389e0d 90%, rgb(100 116 139 / 0));
+  --_g4: no-repeat radial-gradient(farthest-side, #ffec3d 90%, rgb(100 116 139 / 0));
+  height: 30px;
+  aspect-ratio: 2.5;
+  background: var(--_g1), var(--_g2), var(--_g3), var(--_g4);
+  background-size: 20% 50%;
+  animation: l44 1s infinite linear alternate;
+}
+
+@keyframes l44 {
+
+  0%,
+  5% {
+    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+  }
+
+  12.5% {
+    background-position: calc(0*100%/3) 0, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+  }
+
+  25% {
+    background-position: calc(0*100%/3) 0, calc(1*100%/3) 0, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+  }
+
+  37.5% {
+    background-position: calc(0*100%/3) 100%, calc(1*100%/3) 0, calc(2*100%/3) 0, calc(3*100%/3) 50%
+  }
+
+  50% {
+    background-position: calc(0*100%/3) 100%, calc(1*100%/3) 100%, calc(2*100%/3) 0, calc(3*100%/3) 0
+  }
+
+  62.5% {
+    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 100%, calc(2*100%/3) 100%, calc(3*100%/3) 0
+  }
+
+  75% {
+    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 100%, calc(3*100%/3) 100%
+  }
+
+  87.5% {
+    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 100%
+  }
+
+  95%,
+  100% {
+    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+  }
+}
+
+.rbc-allday-cell {
+  display: none;
+}
+
+.rbc-time-content {
+  border: none !important;
+}
+
+.rbc-toolbar-label {
+  text-transform: capitalize;
+  font-size: 23px;
+}
+
+.rbc-month-view {
+  border-radius: 7px;
+}
+
+.rbc-toolbar {
+  margin-bottom: 12px !important;
+}
+
+.rbc-time-content::-webkit-scrollbar {
+  width: 6px;
+  z-index: 99;
+}
+
+.rbc-time-content::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb {
+  background-color: #bfbfbf;
+  border-radius: 5px;
+}
+
+.rbc-time-header {
+  margin-right: 5px !important;
+}
+
+.rbc-today {
+  background-color: rgb(51 102 255 / 0.2) !important;
+}
+
+.rbc-slot-selection {
+  background-color: #bfbfbf !important;
+}
