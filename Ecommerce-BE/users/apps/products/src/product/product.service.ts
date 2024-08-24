@@ -1027,7 +1027,6 @@ export class ProductService {
                     BackgroundAction.createCronJobToUpdateProduct,
                     tmp.product,
                     {
-                        attempts: 3,
                         removeOnComplete: true
                     }
                 )

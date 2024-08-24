@@ -519,7 +519,6 @@ export class OrderService {
                     actionId
                 },
                 {
-                    attempts: 3,
                     removeOnComplete: true
                 }
             )

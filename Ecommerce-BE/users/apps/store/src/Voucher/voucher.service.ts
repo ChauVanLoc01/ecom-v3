@@ -915,9 +915,22 @@ export class VoucherService {
                 endDate: true
             }
         })
+
+        let result = await Promise.all(
+            vouchers.map(async (voucher) => {
+                let hashValue = hash('voucher', voucher.id)
+                let fromCache = await this.cacheManager.get<string>(hashValue)
+                if (fromCache) {
+                    let { quantity } = JSON.parse(fromCache) as { quantity: number }
+                    voucher.currentQuantity = quantity
+                }
+                return voucher
+            })
+        )
+
         return {
             msg: 'ok',
-            result: vouchers
+            result: result
         }
     }
 
