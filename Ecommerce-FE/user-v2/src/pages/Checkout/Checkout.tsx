@@ -81,7 +81,7 @@ const Checkout = () => {
                         sale: { salePromotionId, productPromotionId }
                     } = product
                     productOrders.push({
-                        priceAfter,
+                        priceAfter: product.sale.priceAfter,
                         productId,
                         quantity: 1,
                         productPromotionId,
@@ -100,6 +100,7 @@ const Checkout = () => {
                     })
                 }
             })
+            console.log('isOpen', isOpen, vouchers?.[storeId])
             return {
                 storeId,
                 total,
@@ -108,6 +109,15 @@ const Checkout = () => {
                 voucherIds: isOpen ? vouchers?.[storeId] : voucherIds,
                 productOrders
             }
+        })
+        console.log('payload', {
+            orders,
+            delivery_info: {
+                address: address?.address || '',
+                name: address?.full_name || ''
+            },
+            actionId,
+            payment
         })
         orderMutate({
             orders,
@@ -138,7 +148,7 @@ const Checkout = () => {
             })
             setTimeout(() => {
                 handleOrder()
-            }, 800)
+            }, 500)
         }
     }, [])
 

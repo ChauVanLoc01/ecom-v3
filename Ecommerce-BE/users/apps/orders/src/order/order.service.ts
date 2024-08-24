@@ -371,7 +371,7 @@ export class OrderService {
                     tmp.orderIds.push(orderId)
                     let voucherIds = order.voucherIds
                     let createVoucher: Prisma.OrderCreateInput['OrderVoucher'] = undefined
-                    if (voucherIds.length) {
+                    if (voucherIds?.length) {
                         tmp.vouchers.push(
                             ...voucherIds.map((id) => ({ id, storeId: order.storeId }))
                         )
