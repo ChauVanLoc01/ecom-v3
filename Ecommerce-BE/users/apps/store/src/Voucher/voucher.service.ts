@@ -693,7 +693,11 @@ export class VoucherService {
                             acum.push(e.voucherId)
                         }
                         return acum
-                    }, [])
+                    }, []),
+                    {
+                        attempts: 3,
+                        removeOnComplete: true
+                    }
                 )
             }
         } catch (err) {
