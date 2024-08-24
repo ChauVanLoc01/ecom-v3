@@ -74,6 +74,7 @@ export class ProductController {
     }
 
     @Roles(Role.EMPLOYEE, Role.STORE_OWNER)
+    @Instance(instance.analytic)
     @Permission(analytic_permission.view)
     @Get('best-sell/:productId')
     getProductDetailInBestSell(@Param('productId') productId: string) {
@@ -131,6 +132,7 @@ export class ProductController {
     }
 
     @Roles(Role.EMPLOYEE, Role.STORE_OWNER)
+    @Instance(instance.product)
     @Permission(product_permission.create)
     @Post()
     createProduct(@CurrentUser() user: CurrentStoreType, @Body() body: CreateProductDTO) {
@@ -138,6 +140,7 @@ export class ProductController {
     }
 
     @Roles(Role.EMPLOYEE, Role.STORE_OWNER)
+    @Instance(instance.product)
     @Permission(product_permission.update)
     @Put(':productId')
     updateProduct(
@@ -155,6 +158,7 @@ export class ProductController {
     }
 
     @Roles(Role.STORE_OWNER, Role.EMPLOYEE)
+    @Instance(instance.product)
     @Permission(product_permission.update)
     @Delete(':productId')
     deleteProduct(@CurrentUser() user: CurrentStoreType, @Param('productId') productId: string) {

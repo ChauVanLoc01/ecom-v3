@@ -27,7 +27,6 @@ CREATE TABLE `Order` (
   PRIMARY KEY (`id`),
   KEY `storeId` (`storeId`),
   KEY `userId` (`userId`),
-  KEY `status` (`status`),
   KEY `isDraf` (`isDraf`),
   KEY `idx_userId_status` (`userId`,`status`),
   KEY `storeId_createdAt` (`storeId`,`createdAt`),
@@ -2102,9 +2101,11 @@ INSERT INTO `Order` (`id`, `userId`, `storeId`, `total`, `discount`, `pay`, `not
 ('74401cc9-3745-441a-a0d8-f0ba595e9809',	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	'a160174c-3e17-4623-8504-dea02e634036',	33900,	0,	33900,	NULL,	0,	'CONFIRM_AND_SHIPPING',	'2024-08-15 15:40:30',	'2024-08-15 15:40:30',	3,	0,	NULL,	NULL),
 ('744273dc-4342-4b89-ad25-e47de9acc828',	'a226f227-c629-4c75-98ca-e56a3dab016e',	'de51b1b6-ed27-49b7-a804-57b7992cbc81',	17500,	9625,	-12500,	NULL,	0,	'WAITING_CONFIRM',	'2024-07-13 17:34:15',	NULL,	3,	0,	NULL,	NULL),
 ('745746ad-a0f3-49b2-9fa6-a691acc83b60',	'3206fa68-bd29-4fec-8174-c067ed4beb79',	'93dd964f-2e6d-4874-9c79-009eb4d89202',	286000,	0,	286000,	NULL,	0,	'WAITING_CONFIRM',	'2024-07-24 18:14:14',	NULL,	3,	0,	NULL,	NULL),
+('74695364-451c-475a-9f07-78ee80a4ce4d',	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-24 12:54:29',	NULL,	3,	0,	NULL,	'cash'),
 ('74716ea9-3e30-41be-84ba-3584d2ce80b4',	'bc119302-99fb-44b3-b07f-64eef34454cd',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-12 10:21:35',	NULL,	3,	0,	NULL,	NULL),
 ('748e3947-fc7c-4c0c-8de4-1d92d28b031f',	'bc119302-99fb-44b3-b07f-64eef34454cd',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-12 10:22:13',	NULL,	3,	0,	NULL,	NULL),
 ('748eb4c8-14b7-41ff-bd47-8b1950af4f1c',	'bc119302-99fb-44b3-b07f-64eef34454cd',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-12 10:22:12',	NULL,	3,	0,	NULL,	NULL),
+('749647f0-c089-4433-a40d-97f1d1d71c3f',	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-24 12:54:16',	NULL,	3,	0,	NULL,	'cash'),
 ('749ca6e3-4387-43ab-8767-2fe38f992ce8',	'bc119302-99fb-44b3-b07f-64eef34454cd',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-12 10:21:56',	NULL,	3,	0,	NULL,	NULL),
 ('74ed87bb-ac3f-44b5-97e4-94a7d0c58088',	'bc119302-99fb-44b3-b07f-64eef34454cd',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-12 10:21:43',	NULL,	3,	0,	NULL,	NULL),
 ('74f159eb-99fb-4f6e-8150-232592f5218a',	'bc119302-99fb-44b3-b07f-64eef34454cd',	'465d9c2f-cbb7-4d53-943d-0b902f51861f',	328000,	0,	328000,	NULL,	0,	'WAITING_CONFIRM',	'2024-08-12 10:21:47',	NULL,	3,	0,	NULL,	NULL),
@@ -4534,10 +4535,7 @@ CREATE TABLE `OrderFlow` (
   `orderId` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `orderRefundId` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `createdBy` (`createdBy`),
   KEY `orderId` (`orderId`),
-  KEY `orderRefundId` (`orderRefundId`),
-  KEY `status` (`status`),
   CONSTRAINT `OrderFlow_ibfk_2` FOREIGN KEY (`orderId`) REFERENCES `Order` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -8479,6 +8477,7 @@ INSERT INTO `OrderFlow` (`id`, `status`, `note`, `createdBy`, `createdAt`, `orde
 ('d4576a11-461e-4f8e-8a54-da468e1de66e',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:36',	'ff2ebd0a-c308-408a-8f6b-ed1f2eaff068',	NULL),
 ('d47dabd0-7778-4537-8bee-cc39a32e9a68',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:25:44',	'd95232d1-1544-45e5-bc8d-c3cf675baa63',	NULL),
 ('d48a94d5-7a08-4520-a049-9936c0d5d22b',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:54',	'1997f719-ec2e-43fd-9f9e-a06054e08e29',	NULL),
+('d4901d52-a51e-4a17-8628-6ea5fc00480e',	'WAITING_CONFIRM',	NULL,	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	'2024-08-24 12:54:29',	'74695364-451c-475a-9f07-78ee80a4ce4d',	NULL),
 ('d495ed0d-875d-4681-84fd-d5dd2b1bf8ec',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:25:48',	'bf1686fb-cbcf-45e2-a59a-3008ee3047aa',	NULL),
 ('d49bb2d6-a91f-4ea7-bf40-82facaf6b5a3',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:43',	'6e08827d-71fe-4632-8ee2-09b016b54c76',	NULL),
 ('d4a28725-9a30-49ed-b0a1-1d9b1d00255f',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:49',	'd571345f-d036-4b37-bc96-1dd560d20885',	NULL),
@@ -8543,6 +8542,7 @@ INSERT INTO `OrderFlow` (`id`, `status`, `note`, `createdBy`, `createdAt`, `orde
 ('d8a564bc-c1fa-49fd-8e4c-d1aa4ae44532',	'WAITING_CONFIRM',	NULL,	'94f67cac-944d-472d-8157-bedf488a8502',	'2024-08-21 15:52:47',	'0c2e9641-08a2-4eaa-9e57-b6bb61ced3ad',	NULL),
 ('d8abf907-5bd9-4821-a7e4-eaec720a9164',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:25:31',	'216911c3-142b-4be8-9c91-498f11cf6174',	NULL),
 ('d8ac081f-ac0a-461a-a57f-191e50cb6a89',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:57',	'8c68cfbc-4108-4cf1-b311-d2ea78e0f06a',	NULL),
+('d8ce959a-0d8a-4570-a3fc-a890f0f12ba7',	'WAITING_CONFIRM',	NULL,	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	'2024-08-24 12:54:16',	'749647f0-c089-4433-a40d-97f1d1d71c3f',	NULL),
 ('d8d0ba52-6378-443c-acff-f655bb4a9dba',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:44',	'3ca3135b-9c42-49df-9429-f633da054ebb',	NULL),
 ('d8d19641-1134-4cfe-9306-9686cd0123be',	'WAITING_CONFIRM',	NULL,	'bc119302-99fb-44b3-b07f-64eef34454cd',	'2024-08-12 10:21:42',	'9289ce90-2907-43aa-b718-ee05a5aea335',	NULL),
 ('d8dda259-07e9-4dde-8cd0-e875843e16ca',	'WAITING_CONFIRM',	NULL,	'3206fa68-bd29-4fec-8174-c067ed4beb79',	'2024-07-24 18:13:22',	'0d3234e0-5b9d-43e2-aac8-e3650513017f',	NULL),
@@ -9214,9 +9214,7 @@ CREATE TABLE `OrderRefund` (
   `updatedAt` timestamp NULL DEFAULT NULL,
   `updatedBy` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `createdBy` (`createdBy`),
   KEY `orderId` (`orderId`),
-  KEY `status` (`status`),
   CONSTRAINT `OrderRefund_ibfk_1` FOREIGN KEY (`orderId`) REFERENCES `Order` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -9257,7 +9255,6 @@ CREATE TABLE `OrderShipping` (
   `createdBy` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `createdBy` (`createdBy`),
   KEY `orderId` (`orderId`),
   CONSTRAINT `OrderShipping_ibfk_1` FOREIGN KEY (`orderId`) REFERENCES `Order` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -10911,6 +10908,7 @@ INSERT INTO `OrderShipping` (`id`, `orderId`, `name`, `address`, `type`, `create
 ('5ec5b213-4692-4b91-b0e5-6a3310feab71',	'26ca9dfe-eae6-4b2b-98fc-eeccb0195b07',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:25:45',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('5f00833e-e715-400d-9fb6-5c4f0141c327',	'afdc7a49-1b46-4d42-b2e5-270253f78d5e',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:25:16',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('5f14f090-17d0-49e7-ae4e-53faefd1e4ce',	'6a5f00aa-93af-4075-b874-f76cd0016d9c',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:21:44',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
+('5f2a91f1-95e5-4601-941e-10e556a59be5',	'749647f0-c089-4433-a40d-97f1d1d71c3f',	'CHAU VAN LOC22',	'TpHCM\nThu Duc',	'WAITING_CONFIRM',	'2024-08-24 12:54:16',	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	NULL),
 ('5f44f476-040f-4897-9a4b-ae576656ece9',	'c73f80da-9bd0-48cd-9c39-1f4dc96a025f',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:25:55',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('5f551c43-ce7a-4ab8-b288-af031b051815',	'a4f28bba-feec-403e-99e2-c5d5a66093a3',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:21:50',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('5f6b7a33-ab3b-4955-82aa-54eb691bee44',	'e11a2f6a-cfd1-4b16-bb1f-3c87e897b155',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:21:58',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
@@ -13563,6 +13561,7 @@ INSERT INTO `OrderShipping` (`id`, `orderId`, `name`, `address`, `type`, `create
 ('f4cba924-ed12-4e8d-b850-503635b94981',	'1e43cfde-d1e4-452a-beb3-5cc533270864',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:21:41',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('f4d86339-7093-4cd9-87bc-c27602623c03',	'2536c2bd-3384-4120-b8ef-d6724aeaeccd',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:22:03',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('f4eeb870-722c-4beb-b4a5-d22d9326e048',	'8616ca26-51e7-4574-9c98-2277d8f45788',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:21:50',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
+('f4f0c833-2199-43fe-84bf-90f00669af8e',	'74695364-451c-475a-9f07-78ee80a4ce4d',	'CHAU VAN LOC22',	'TpHCM\nThu Duc',	'WAITING_CONFIRM',	'2024-08-24 12:54:29',	'7d4a0ef3-5ab0-45ab-b4c1-c049596e2749',	NULL),
 ('f502621e-2d9a-44c6-8462-6819346bd1f0',	'7b769791-698a-4cea-a664-7c8e23ba6494',	'CHAU VAN LOC',	'TpHCM\nThu Duc',	'WAITING_CONFIRM',	'2024-08-21 20:13:40',	'94f67cac-944d-472d-8157-bedf488a8502',	NULL),
 ('f51ae66b-2b13-42db-8a0a-7eef3a72f4a1',	'ac606dec-04aa-4893-9242-bf121e25d81f',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:22:00',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
 ('f53b1354-c70e-4ca4-bf44-f047591109e8',	'3e523b03-7f16-43f7-8983-027f9fbce7ec',	'CHAU VAN LOC',	'TpHCM\nTan Binh',	'WAITING_CONFIRM',	'2024-08-12 10:25:50',	'bc119302-99fb-44b3-b07f-64eef34454cd',	NULL),
@@ -13758,7 +13757,6 @@ CREATE TABLE `OrderVoucher` (
   `createdAt` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `orderId` (`orderId`),
-  KEY `voucherId` (`voucherId`),
   CONSTRAINT `OrderVoucher_ibfk_1` FOREIGN KEY (`orderId`) REFERENCES `Order` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -14586,6 +14584,7 @@ INSERT INTO `ProductOrder` (`id`, `productId`, `quantity`, `priceBefore`, `price
 ('2753e993-0805-4114-bcf6-413372dc75db',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'0446d27f-e691-4b15-a4d9-0f8b82dfb5f6'),
 ('2765c1f9-93de-4197-b199-08066c3e3867',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'81729d9b-d0a5-43a4-a5b7-e8d4a3239cdd'),
 ('277424fa-5f48-4102-b4c1-1e28a8edb0ae',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'cc0c1eae-3160-445a-84aa-f6e85c55f1d5'),
+('27751e1b-0ebd-4339-a8bf-e5f093c478d8',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'749647f0-c089-4433-a40d-97f1d1d71c3f'),
 ('27893f6a-ba61-4755-b856-2272a42e5b7e',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'a1498109-b50a-4936-9208-ae47a979bdc3'),
 ('278a7ff7-e8de-4fb0-982e-4f3529904bf2',	'203ddd9e-dddd-4971-8f06-fe48939cd035',	1,	NULL,	150000,	'22ca50b3-f3f3-4f26-a628-2a9bd6d1f8f0'),
 ('278e9fb0-72f5-431c-a253-29ac386e785e',	'01236d43-bf11-4b6d-bd3b-7ce3ff95bfb2',	1,	NULL,	286000,	'fe74abb9-7e8f-477d-adcb-f90b8c872352'),
@@ -16336,6 +16335,7 @@ INSERT INTO `ProductOrder` (`id`, `productId`, `quantity`, `priceBefore`, `price
 ('897609ce-5b75-4f3a-a808-765a005d0d44',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'779dd081-82ea-444d-92fe-e46741fd97d6'),
 ('8987d1ec-c676-472b-ba14-2b79149a9240',	'01236d43-bf11-4b6d-bd3b-7ce3ff95bfb2',	1,	NULL,	286000,	'03dbfa3a-e561-413a-80f5-6fe05efa2e1d'),
 ('89892942-3c61-4fe2-8c3c-8006ce763e86',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'981c6754-98a0-48de-87a7-590b9c0e6ab1'),
+('89912dfd-6b40-403b-8daf-f51fe73ea736',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'74695364-451c-475a-9f07-78ee80a4ce4d'),
 ('89a012e4-a48c-44cb-82e1-82134de86b1e',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'b749f462-0c0c-4d24-98ce-5db13b62ba9b'),
 ('89a2e004-bad0-4f57-bb14-a923460cca7f',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'd0414df2-d37e-4cb7-a12a-8e5c7da41ccb'),
 ('89a580d4-454e-4d19-a6c0-c49ff53fb5ae',	'0045ffae-a79d-427b-a3a6-917492310c51',	1,	NULL,	328000,	'2075e4c7-d132-49fe-bc45-44e80379ff31'),
@@ -18494,4 +18494,4 @@ CREATE TABLE `RequestComplain` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- 2024-08-22 01:50:18
+-- 2024-08-24 13:00:09

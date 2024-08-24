@@ -28,7 +28,7 @@ import { Status } from 'common/enums/status.enum'
 import { CurrentStoreType } from 'common/types/current.type'
 import { MessageReturn, Return } from 'common/types/result.type'
 import { hash } from 'common/utils/order_helper'
-import { add, endOfHour, endOfWeek, format, startOfHour, startOfWeek } from 'date-fns'
+import { add, endOfHour, endOfWeek, format, startOfHour, startOfWeek, sub } from 'date-fns'
 import { keyBy, omit } from 'lodash'
 import { firstValueFrom } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
@@ -75,15 +75,24 @@ export class SaleService {
     async getSalePromotion(user: CurrentStoreType, query: QuerySalePromotionDTO): Promise<Return> {
         try {
             const { storeId } = user
-            const { date } = query
+            let { date } = query
+            console.log(
+                'startOfWeek',
+                sub(date, { hours: 8 }),
+                startOfWeek(date, { weekStartsOn: 1 })
+            )
+            console.log(
+                'endOfWeek',
+                add(date, { hours: 7 }),
+                add(endOfWeek(date, { weekStartsOn: 1 }), { hours: 8 })
+            )
             const promotions = await this.prisma.salePromotion.findMany({
                 where: {
-                    status: Status.ACTIVE,
                     startDate: {
-                        gte: startOfWeek(date, { weekStartsOn: 1 })
+                        gt: startOfWeek(sub(date, { hours: 8 }), { weekStartsOn: 1 })
                     },
                     endDate: {
-                        lte: endOfWeek(date, { weekStartsOn: 1 })
+                        lt: add(endOfWeek(date, { weekStartsOn: 1 }), { hours: 8 })
                     }
                 }
             })

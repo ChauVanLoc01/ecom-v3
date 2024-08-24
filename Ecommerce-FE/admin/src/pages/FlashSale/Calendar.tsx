@@ -65,9 +65,9 @@ const Calendar = ({ promotionObjs, onSelectEvent, storePromotionObj, currentDate
     const handleChangeDate = (type: 'previous' | 'next') => () => {
         setCurrentDate((pre) => {
             if (type === 'previous') {
-                return startOfWeek(sub(pre, { days: 10 }), { weekStartsOn: 1 })
+                return sub(pre, { days: 7 })
             }
-            return endOfWeek(add(pre, { days: 10 }), { weekStartsOn: 1 })
+            return add(pre, { days: 7 })
         })
     }
 
@@ -121,7 +121,7 @@ const Calendar = ({ promotionObjs, onSelectEvent, storePromotionObj, currentDate
                                                     isPast(sub(promotionObjs?.[date]?.endDate, { hours: 0 }))
                                             })}
                                             onClick={onSelectEvent(promotionObjs?.[date])}
-                                            disabled={isPast(add(promotionObjs?.[date]?.endDate, { hours: 7 }))}
+                                            // disabled={isPast(add(promotionObjs?.[date]?.endDate, { hours: 7 }))}
                                         >
                                             {promotionObjs?.[date]?.title}
                                             {!!storePromotionObj?.[promotionObjs?.[date]?.id] && (
@@ -155,7 +155,7 @@ type HeaderCalendarProps = {
 const HeaderCalendar = ({ parentRef, dayInWeek, handleChangeDate, onTop, setCurrentDate }: HeaderCalendarProps) => {
     return (
         <Flex
-            className={cn(`!w-[${parentRef.current?.offsetWidth}px] sticky top-0 bg-gray-200`, {
+            className={cn(`!w-[${parentRef.current?.offsetWidth}px] sticky top-0 bg-gray-200 z-[100]`, {
                 'shadow-md': !onTop
             })}
         >

@@ -24,8 +24,8 @@ import { EmployeeService } from './employee.service'
 export class EmployeeController {
     constructor(private readonly empService: EmployeeService) {}
 
-    @Roles(Role.STORE_OWNER, Role.EMPLOYEE)
-    @Permission(employee_permission.detail)
+    // @Roles(Role.STORE_OWNER, Role.EMPLOYEE)
+    // @Permission(employee_permission.detail)
     @Get('permission/:id')
     getPermissionDetail(@Param('id') id: string) {
         return this.empService.getPermissionDetail(id)

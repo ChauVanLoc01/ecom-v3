@@ -240,22 +240,22 @@ export class RatingService {
         const [length, ratings] = await Promise.all([
             this.prisma.rating.count({
                 where: {
+                    storeId,
+                    isReply: reply,
                     createdAt: {
                         gte: startDate,
                         lte: endDate
-                    },
-                    storeId,
-                    isReply: reply
+                    }
                 }
             }),
             this.prisma.rating.findMany({
                 where: {
+                    storeId,
+                    isReply: reply,
                     createdAt: {
                         gte: startDate,
                         lte: endDate
-                    },
-                    storeId,
-                    isReply: reply
+                    }
                 },
                 include: {
                     RatingReply: {

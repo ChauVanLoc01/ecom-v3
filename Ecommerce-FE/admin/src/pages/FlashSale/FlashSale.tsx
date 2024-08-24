@@ -117,7 +117,7 @@ const FlashSale = () => {
     }, [productList])
 
     const { data, refetch: refetchSalePromotion } = useQuery({
-        queryKey: ['salePromotion'],
+        queryKey: ['salePromotion', currentDate],
         queryFn: () => sale_api.getSalePromotion(add(startOfDay(currentDate), { hours: 7 }).toISOString()),
         select: (data) => ({
             promotionObjs: keyBy(data.data.result.promotions, (e) => e.startDate),

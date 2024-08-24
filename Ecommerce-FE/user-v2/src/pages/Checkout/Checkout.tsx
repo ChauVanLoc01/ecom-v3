@@ -83,9 +83,14 @@ const Checkout = () => {
                     productOrders.push({
                         priceAfter,
                         productId,
-                        quantity: buy,
+                        quantity: 1,
                         productPromotionId,
                         salePromotionId
+                    })
+                    productOrders.push({
+                        priceAfter,
+                        productId,
+                        quantity: buy - 1
                     })
                 } else {
                     productOrders.push({

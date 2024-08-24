@@ -17,7 +17,6 @@ import {
     endOfWeek,
     format,
     getDate,
-    getDay,
     getMonth,
     setDefaultOptions,
     startOfDay,
@@ -49,51 +48,58 @@ export class ScheduleService {
                 hours: 7
             }
         )
-        let end = add(
-            endOfWeek(payload, {
-                weekStartsOn: 1
-            }),
-            {
-                hours: 7
-            }
-        )
+        let end = endOfWeek(payload, {
+            weekStartsOn: 1
+        })
         let tmp: Date[] = []
         eachDayOfInterval({ start, end }).forEach((day) => {
             let dayInMonth = getDate(day)
             let month = getMonth(day) + 1
             if (month === dayInMonth) {
-                tmp.push(day)
+                tmp.push(add(day, { hours: 7 }))
                 return
             }
-            let hours = eachHourOfInterval({ start: startOfDay(day), end: endOfDay(day) })
+            let hours = eachHourOfInterval({ start: startOfDay(day), end: endOfDay(day) }).map(
+                (day) => add(day, { hours: 7 })
+            )
             tmp.push(...hours)
         })
         return tmp
     }
 
-    @Cron('1 18 * * * 1', {
+    @Cron('1 49 * * * 1', {
         name: 'auto creating sale promotion'
     })
     async autoCreatingSalePromotion() {
-        let tmp = this.calDate(new Date('08/06/2024'))
+        let tmp = this.calDate(new Date())
         chunk(tmp, 24).map((dates, idx) => this.createSalePromotion(uuidv4(), 4 * idx, dates))
     }
 
     async createSalePromotion(name: string, second: number, data: Date[]) {
-        const cron_job = new CronJob(`${second} 19 * * * 1`, async () => {
+        const cron_job = new CronJob(`${second} 50 * * * *`, async () => {
             await Promise.all(
                 data.map((date) => {
                     let formatDate = format(sub(date, { hours: 7 }), 'HH:mm dd-MM-yyyy')
+                    let title = `Daily Sale ${formatDate}`
+                    let type = SalePromotion.NORMAL
+                    let description = `Chương trình giảm giá hằng ngày kích cầu mua sắm ${formatDate}`
+                    let dayInMonth = getDate(date)
+                    let month = getMonth(date) + 1
+                    if (month === dayInMonth) {
+                        title = `Siêu sale hằng tháng ${formatDate}`
+                        description = `Đại tiệc siêu sale hằng tháng ${formatDate}`
+                        type = SalePromotion.SPEACIAL
+                    }
                     return this.prisma.salePromotion.create({
                         data: {
                             id: uuidv4(),
-                            title: `Daily Sale ${formatDate}`,
-                            description: `Chương trình giảm giá hằng ngày kích cầu mua sắm ${formatDate}`,
+                            title,
+                            description,
                             startDate: date,
                             endDate: add(date, { hours: 1 }),
                             createdAt: new Date(),
                             status: Status.BLOCK,
-                            type: SalePromotion.NORMAL,
+                            type,
                             createdBy: 'system'
                         }
                     })

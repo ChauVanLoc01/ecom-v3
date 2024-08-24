@@ -523,12 +523,12 @@ export class VoucherService {
                     storeId: {
                         in: storesID
                     },
-                    code,
                     status: Status.ACTIVE,
                     type: Status.HIDDEN,
                     endDate: {
                         gt: add(addHours(new Date(), 7), { seconds: 30 })
-                    }
+                    },
+                    code
                 }
             })
 
