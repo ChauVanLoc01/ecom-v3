@@ -7,7 +7,7 @@ type RatingProps = {
     handleRating?: (rateNum: number) => void
 }
 
-const Rating = ({ defaultValue, handleRating }: RatingProps) => {
+const Rating = ({ handleRating }: RatingProps) => {
     const [position, setPosition] = useState<{ click?: number; hover?: number }>({})
 
     const handleMouse = (type: 'click' | 'hover', index: number) => () => {

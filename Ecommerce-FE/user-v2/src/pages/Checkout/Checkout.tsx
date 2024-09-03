@@ -36,7 +36,7 @@ const CheckOutEmpty = () => {
 }
 
 const Checkout = () => {
-    const { products, ids, isCanOrder, actionId, setProducts, socket } = useContext(AppContext)
+    const { products, ids, isCanOrder, actionId } = useContext(AppContext)
 
     if (!ids) {
         return <CheckOutEmpty />

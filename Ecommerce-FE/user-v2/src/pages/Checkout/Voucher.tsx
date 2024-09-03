@@ -54,8 +54,7 @@ const Voucher = ({ selectedVoucher, setSelectedVoucher, summary, allVoucher, set
     const [search, setSearch] = useState<string>('')
     const handleFocus = () => setTimeout(() => setOpen(true), 150)
     const [voucher, setVoucher] = useState<Record<string, VoucherWithCondition[]> | undefined>(undefined)
-    const [isSearching, setIsSearching] = useState<boolean>(false)
-    const [selected, setSelected] = useState<VoucherWithCondition | undefined>(undefined)
+    const [_, setIsSearching] = useState<boolean>(false)
 
     const { data: globalVouchers } = useQuery({
         queryKey: ['global_vouchers'],

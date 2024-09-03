@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, Skeleton, Text } from '@radix-ui/themes'
+import { Box, Flex, Grid, Skeleton } from '@radix-ui/themes'
 import { CurrentSalePromotion } from 'src/types/sale.type'
 import ProductFlashSale from '../ProductList/FlashSale/ProductFlashSale'
 
@@ -7,8 +7,6 @@ type FlashSaleProductsProps = {
 }
 
 const FlashSaleProducts = ({ products }: FlashSaleProductsProps) => {
-    console.log('products', products)
-
     return (
         <div>
             {products ? (

@@ -1,9 +1,7 @@
-import { AxiosResponse } from 'axios'
 import { LoaderFunction } from 'react-router-dom'
 import { profileFetching } from 'src/apis/profile'
 import { StoreFetching } from 'src/apis/store'
 import { queryClient } from 'src/routes/main.route'
-import { CurrentSalePromotion } from 'src/types/sale.type'
 import { getProducts, ls } from 'src/utils/localStorage'
 import { loadingEvent } from 'src/utils/utils.ts'
 
@@ -16,10 +14,6 @@ export const checkoutLoader: LoaderFunction = async () => {
         loadingEvent.end()
         return []
     }
-
-    const current_sale_promotino = queryClient.getQueryData<AxiosResponse<CurrentSalePromotion>>([
-        'current-sale-promotion'
-    ])?.data?.result
 
     const stores = Object.keys(getProducts().stores)
     // const productsId: string[] = Object.keys(stores).reduce((acum: any, e) => {

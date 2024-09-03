@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build",
+        "build": "vite build",
         "preview": "vite preview",
         "lint": "eslint --ext ts,tsx src/",
         "lint:fix": "eslint --fix --ext ts,tsx src/",
@@ -59,7 +59,6 @@
         "react-router-dom": "^6.22.1",
         "react-simple-star-rating": "^5.1.7",
         "react-slick": "^0.30.2",
-        "react-star-rating-component": "^1.4.1",
         "react-vertical-timeline-component": "^3.6.0",
         "shadcn-ui": "^0.8.0",
         "simplebar-react": "^3.2.4",

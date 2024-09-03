@@ -1,4 +1,4 @@
-FROM node:19-alpine
+FROM node:20-alpine
 
 EXPOSE 3000
 
@@ -6,8 +6,10 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN yarn
+RUN npm install
 
 COPY . .
 
-CMD [ "yarn", "dev" ]
+RUN npm run build
+
+CMD [ "npm", "run", "preview" ]

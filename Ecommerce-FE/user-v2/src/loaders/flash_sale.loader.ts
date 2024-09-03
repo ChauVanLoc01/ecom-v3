@@ -19,7 +19,7 @@ export const flashSaleLoader: LoaderFunction = async ({ params }) => {
         }),
         queryClient.fetchQuery({
             queryKey: ['product-of-sale-promotion', salePromotionId],
-            queryFn: sale_api.getProductOfSalePromotion(salePromotionId),
+            queryFn: sale_api.getProductOfSalePromotion(salePromotionId, { page: 1 }),
             staleTime: 1000 * 60 * 2
         })
     ])

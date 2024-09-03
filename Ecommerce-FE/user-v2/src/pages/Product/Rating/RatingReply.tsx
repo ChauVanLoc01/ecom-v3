@@ -4,7 +4,7 @@ type RatingReplyProps = {
     data: RatingReplyType
 }
 
-const RatingReply = ({ data }: RatingReplyProps) => {
+const RatingReply = ({}: RatingReplyProps) => {
     return <div>RatingReply</div>
 }
 

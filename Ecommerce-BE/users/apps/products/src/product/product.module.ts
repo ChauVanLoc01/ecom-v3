@@ -1,4 +1,5 @@
 import { ConfigModule, PrismaModule } from '@app/common'
+import { RedisProvider } from '@app/common/cache/redis.provider'
 import { BullModule } from '@nestjs/bull'
 import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
@@ -149,6 +150,6 @@ import { ProductService } from './product.service'
         PrismaModule
     ],
     controllers: [ProductController],
-    providers: [ProductService, JwtService, ProductConsummer]
+    providers: [ProductService, JwtService, ProductConsummer, RedisProvider]
 })
 export class ProductModule {}

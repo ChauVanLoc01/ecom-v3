@@ -1,10 +1,9 @@
-import { Box, Flex, Progress, Skeleton, Text } from '@radix-ui/themes'
+import { Box, Flex, Skeleton, Text } from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { RatingApi } from 'src/apis/rating.api'
 import RatingContainer from './RatingContainer'
-import { calcPercentRating } from 'src/utils/utils.ts'
 
 type RatingListProps = {
     storeId: string
@@ -13,7 +12,7 @@ type RatingListProps = {
 const RatingList = ({ storeId }: RatingListProps) => {
     const params = useParams()
     const productId = params.productId?.split('-0-')[1]
-    const [page, setPage] = useState<number>(0)
+    const [page, _] = useState<number>(0)
 
     const { data: ratingList } = useQuery({
         queryKey: ['ratings', { productId, page }],

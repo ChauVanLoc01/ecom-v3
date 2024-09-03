@@ -17,7 +17,7 @@ type Step1Props = {
 }
 
 const Step1 = ({ handleRemoveVoucher, setAllVoucher }: Step1Props) => {
-    const { ids, products } = useContext(AppContext)
+    const { ids } = useContext(AppContext)
     const [stores, setStores] = useState<string[]>(ids?.all_storeIds || [])
 
     return (

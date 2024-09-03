@@ -1,3 +1,4 @@
+import { RedisClient } from '@app/common/cache/redis.provider'
 import { PrismaServiceProduct } from '@app/common/prisma/product_prisma.service'
 import { MailerService } from '@nestjs-modules/mailer'
 import { InjectQueue } from '@nestjs/bull'
@@ -66,7 +67,8 @@ export class ProductService {
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private schedulerRegistry: SchedulerRegistry,
         @InjectQueue(BackgroundName.product) private productBackgroundQueue: Queue,
-        private readonly mailService: MailerService
+        private readonly mailService: MailerService,
+        @Inject('REDIS_CLIENT') private readonly redis: RedisClient
     ) {}
 
     async getALlProductForUser(query: QueryProductType): Promise<Return> {

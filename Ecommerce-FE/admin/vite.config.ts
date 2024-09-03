@@ -8,13 +8,10 @@ export default defineConfig({
     plugins: [react()],
     server: {
         host: true,
-        port: 4000,
-        watch: {
-            usePolling: true
-        }
+        port: 4000
     },
     preview: {
-        port: 4002
+        port: 4000
     },
     css: {
         devSourcemap: true
