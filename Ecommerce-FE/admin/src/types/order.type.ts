@@ -24,6 +24,7 @@ export type OrderQuery = {
     total?: string
     start_date?: string
     end_date?: string
+    search?: string
 } & Pagination
 
 export type OrderListReponse = Return<{

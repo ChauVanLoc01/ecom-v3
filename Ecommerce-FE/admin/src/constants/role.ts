@@ -74,7 +74,8 @@ export enum instance {
     voucher = 'voucher',
     analytic = 'analytics',
     store = 'store',
-    user = 'user'
+    user = 'user',
+    sub_admin = 'sub_admin'
 }
 
 export const map_path = {
@@ -200,5 +201,10 @@ export const SideNavData: Record<instance, { label: string; path: string; icon: 
         label: 'Người dùng',
         path: route.user,
         icon: 'MdSupervisorAccount'
+    },
+    [instance.sub_admin]: {
+        label: 'Quản trị',
+        path: route.sub_admin,
+        icon: 'FaUserCog'
     }
 }

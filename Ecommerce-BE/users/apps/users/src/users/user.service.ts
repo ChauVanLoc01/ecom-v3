@@ -323,10 +323,9 @@ export class UserService {
 
     async updateStatusOfUser(userId: string, body: UpdateStatusOfUserDTO): Promise<Return> {
         let { status } = body
-        console.log('userId', userId)
         try {
             await this.prisma.$transaction(async (tx) => {
-                const accountExist = await tx.account.findFirst({
+                await tx.account.findFirst({
                     where: {
                         userId
                     },
@@ -334,25 +333,14 @@ export class UserService {
                         storeRoleId: true
                     }
                 })
-
-                await Promise.all([
-                    tx.user.update({
-                        where: {
-                            id: userId
-                        },
-                        data: {
-                            status
-                        }
-                    }),
-                    tx.storeRole.update({
-                        where: {
-                            id: accountExist.storeRoleId
-                        },
-                        data: {
-                            status
-                        }
-                    })
-                ])
+                await tx.user.update({
+                    where: {
+                        id: userId
+                    },
+                    data: {
+                        status
+                    }
+                })
             })
 
             return {
@@ -360,7 +348,6 @@ export class UserService {
                 result: undefined
             }
         } catch (err) {
-            console.log('err', err)
             throw new InternalServerErrorException('Cập nhật trạng thái người dùng thất bại')
         }
     }

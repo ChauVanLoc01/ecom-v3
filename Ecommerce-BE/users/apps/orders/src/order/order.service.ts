@@ -12,7 +12,6 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { ClientProxy } from '@nestjs/microservices'
 import { SchedulerRegistry } from '@nestjs/schedule'
-import { Prisma } from '../../../../prisma/generated/order'
 import { Queue } from 'bull'
 import { Cache } from 'cache-manager'
 import { BackgroundAction, BackgroundName } from 'common/constants/background-job.constant'
@@ -50,6 +49,7 @@ import { Dictionary, isUndefined, omitBy } from 'lodash'
 import { firstValueFrom } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
 import { CreateOrder, CreateOrderDTO } from '../../../../common/dtos/create_order.dto'
+import { Prisma } from '../../../../prisma/generated/order'
 import {
     CreateOrderRefundDTO,
     ReOpenOrderRefundDTO,
@@ -193,7 +193,7 @@ export class OrderService {
     async getAllOrderByStore(user: CurrentStoreType, query: QueryOrderType): Promise<Return> {
         const { storeId } = user
 
-        const { createdAt, total, start_date, end_date, limit, page, status } = query
+        const { createdAt, total, start_date, search, end_date, limit, page, status } = query
 
         const take = limit | this.configService.get('app.limit_default')
 
@@ -204,7 +204,8 @@ export class OrderService {
                     createdAt: {
                         lte: end_date,
                         gte: start_date
-                    }
+                    },
+                    id: search || undefined
                 }
             }),
             this.prisma.order.findMany({
@@ -214,7 +215,8 @@ export class OrderService {
                         lte: end_date,
                         gte: start_date
                     },
-                    status
+                    status,
+                    id: search || undefined
                 },
                 orderBy: {
                     createdAt,
@@ -491,10 +493,7 @@ export class OrderService {
             format(new Date(), 'hh:mm:ss:SSS dd/MM')
         )
         try {
-            await this.orderBackgroundQueue.add(BackgroundAction.rollBackOrder, orderIds, {
-                attempts: 3,
-                removeOnComplete: true
-            })
+            await this.orderBackgroundQueue.add(BackgroundAction.rollBackOrder, orderIds)
             console.log(':::::::::Success: Gọi backgound job để xử lý rollback order::::::::::::')
         } catch (err) {
             console.log('*******Fail: Roll back order gặp lỗi********', err)
@@ -512,17 +511,10 @@ export class OrderService {
         } = body
         try {
             console.log('::::::::::Success: Gọi background job để commit order::::::::::::')
-            await this.orderBackgroundQueue.add(
-                BackgroundAction.reUpdateIsDrafOrder,
-                {
-                    orderIds,
-                    actionId
-                },
-                {
-                    attempts: 3,
-                    removeOnComplete: true
-                }
-            )
+            await this.orderBackgroundQueue.add(BackgroundAction.reUpdateIsDrafOrder, {
+                orderIds,
+                actionId
+            })
         } catch (err) {
             console.log('********Fail: Lỗi khởi tạo background job để remove isDraf*********', err)
         }

@@ -49,6 +49,7 @@ export type ProductListQuery = {
     price_max?: number
     limit?: number
     page?: number
+    status?: 'ACTIVE' | 'BLOCK'
 }
 
 export type ProductListResponse = {

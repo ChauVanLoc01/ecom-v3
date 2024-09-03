@@ -19,6 +19,7 @@ type OrderFilterProps = {
 
 const OrderFilter = ({ setQuery, pagination }: OrderFilterProps) => {
     const [date, setDate] = useState<DateRange | undefined>(undefined)
+    const [search, setSearch] = useState<string>('')
 
     const handleSelectStatus = (value: string) => {
         if (value !== 'All') {
@@ -33,6 +34,10 @@ const OrderFilter = ({ setQuery, pagination }: OrderFilterProps) => {
                 return omit(pre, ['status'])
             })
         }
+    }
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value)
     }
 
     useEffect(() => {
@@ -50,10 +55,14 @@ const OrderFilter = ({ setQuery, pagination }: OrderFilterProps) => {
         }
     }, [date])
 
+    useEffect(() => {
+        setQuery((pre) => ({ ...pre, search }))
+    }, [search])
+
     return (
         <Flex justify='between' width='100%'>
             <Flex gap={'3'}>
-                <TextField.Root placeholder='Tìm kiếm đơn hàng...' size='3'>
+                <TextField.Root placeholder='Tìm kiếm đơn hàng...' size='3' onChange={handleSearch}>
                     <TextField.Slot>
                         <MagnifyingGlassIcon />
                     </TextField.Slot>

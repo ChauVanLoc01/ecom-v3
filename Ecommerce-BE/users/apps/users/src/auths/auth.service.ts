@@ -230,14 +230,24 @@ export class AuthService {
     async userRegister(registerDto: RegisterDTO): Promise<Return> {
         const { email, password, username, full_name } = registerDto
 
-        const accountExist = await this.prisma.account.findUnique({
-            where: {
-                username
-            }
-        })
+        const [accountExist, userExist] = await Promise.all([
+            this.prisma.account.findUnique({
+                where: {
+                    username
+                }
+            }),
+            this.prisma.user.findFirst({
+                where: {
+                    email
+                }
+            })
+        ])
 
         if (accountExist) {
             throw new BadRequestException('User name đã tồn tại')
+        }
+        if (userExist) {
+            throw new BadRequestException('Email đã tồn tại')
         }
 
         let hash_password = this.hashPassword(password)
@@ -498,7 +508,7 @@ export class AuthService {
         })
 
         if (!userExist) {
-            throw new UnauthorizedException('Người dùng không tồn tại')
+            throw new BadRequestException('Người dùng không tồn tại')
         }
 
         const code = Math.floor(100000 + Math.random() * 900000)
@@ -532,8 +542,6 @@ export class AuthService {
             username: string
             new_password: string
         }
-
-        console.log('fromCache', fromCache)
 
         const { password, ...rest } = await this.prisma.account.update({
             where: {
@@ -569,5 +577,26 @@ export class AuthService {
                 full_name: true
             }
         })
+    }
+
+    async getEmailStore(storeId: string) {
+        const role = await this.prisma.storeRole.findFirst({
+            where: {
+                storeId,
+                role: Role.STORE_OWNER
+            },
+            include: {
+                Account: {
+                    include: {
+                        User_Account_userIdToUser: {
+                            select: {
+                                email: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        return role?.Account
     }
 }

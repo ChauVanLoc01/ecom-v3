@@ -163,7 +163,6 @@ export class OrderController {
     @Public()
     @EventPattern(roll_back_order)
     rollbackOrder(@Payload() payload: CreateOrderPayload<'roll_back_order'>) {
-        console.log('roll back order nhận được thông tin')
         return this.ordersService.rollbackOrder(payload)
     }
 

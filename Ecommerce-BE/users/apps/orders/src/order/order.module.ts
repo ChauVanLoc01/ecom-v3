@@ -113,7 +113,11 @@ import { OrderService } from './order.service'
             ]
         }),
         BullModule.registerQueue({
-            name: BackgroundName.order
+            name: BackgroundName.order,
+            defaultJobOptions: {
+                attempts: 3,
+                removeOnComplete: true
+            }
         }),
         PrismaModule,
         JwtModule

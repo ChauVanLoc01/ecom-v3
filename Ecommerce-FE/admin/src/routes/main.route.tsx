@@ -11,6 +11,7 @@ import {
     ProductPermission,
     RatingPermission,
     StorePermission,
+    SubAdminPermission,
     UserPermission,
     VoucherPermission
 } from 'src/components/Permission/Permission'
@@ -26,6 +27,7 @@ import { ratingLoader } from 'src/loader/rating.loader'
 import { storeLoader } from 'src/loader/store.loader'
 import { userLoader } from 'src/loader/user.loader'
 import { voucherLoader } from 'src/loader/voucher.loader'
+import SubAdmin from 'src/pages/SubAdmin/SubAdmin'
 
 const MainLayout = loadable(() => import('src/layouts/MainLayout'))
 const FlashSale = loadable(() => import('src/pages/FlashSale/FlashSale'))

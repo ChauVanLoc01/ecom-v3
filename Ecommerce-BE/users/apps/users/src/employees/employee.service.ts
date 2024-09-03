@@ -161,17 +161,28 @@ export class EmployeeService {
         const { userId, storeId } = user
         const [empId, empStoreRoleId] = [uuidv4(), uuidv4()]
 
-        const accountExist = await this.prisma.account.findUnique({
-            where: {
-                username
-            }
-        })
+        const [accountExist, userExist] = await Promise.all([
+            this.prisma.account.findUnique({
+                where: {
+                    username
+                }
+            }),
+            this.prisma.user.findFirst({
+                where: {
+                    email
+                }
+            })
+        ])
 
         if (accountExist) {
             throw new BadRequestException('Tài khoản đã tồn tại')
         }
 
-        const hashPassword = await this.authService.hashPassword(password)
+        if (userExist) {
+            throw new BadRequestException('Email đã tồn tại')
+        }
+
+        const hashPassword = this.authService.hashPassword(password)
 
         const [newEmp, newStoreRole, newAccount] = await this.prisma.$transaction(async (tx) => {
             const result = await Promise.all([
@@ -206,8 +217,7 @@ export class EmployeeService {
             await tx.permission.createMany({
                 data: actions.reduce((acum, action) => {
                     let { instance, permissions } = action
-                    let arr = permissions.map((permission, idx) => {
-                        console.log(`userId ${idx}`, userId)
+                    let arr = permissions.map((permission) => {
                         return {
                             id: uuidv4(),
                             createdBy: userId,
@@ -223,6 +233,78 @@ export class EmployeeService {
             })
 
             return [...result, created_account]
+        })
+
+        return {
+            msg: 'Ok',
+            result: undefined
+        }
+    }
+    async createSubAdmin(user: CurrentStoreType, body: CreateEmployee): Promise<Return> {
+        const { email, full_name, password, username, actions } = body
+        const { userId } = user
+        const empId = uuidv4()
+
+        const [accountExist, userExist] = await Promise.all([
+            this.prisma.account.findUnique({
+                where: {
+                    username
+                }
+            }),
+            this.prisma.user.findFirst({
+                where: {
+                    email
+                }
+            })
+        ])
+
+        if (accountExist) {
+            throw new BadRequestException('Tài khoản đã tồn tại')
+        }
+
+        if (userExist) {
+            throw new BadRequestException('Email đã tồn tại')
+        }
+
+        const hashPassword = this.authService.hashPassword(password)
+
+        await this.prisma.$transaction(async (tx) => {
+            const result = await tx.user.create({
+                data: {
+                    id: empId,
+                    email,
+                    full_name,
+                    role: Role.EMPLOYEE,
+                    status: Status.ACTIVE,
+                    createdAt: new Date()
+                }
+            })
+            let created_account = await tx.account.create({
+                data: {
+                    username,
+                    password: hashPassword,
+                    userId: empId,
+                    createdBy: userId,
+                    createdAt: new Date()
+                }
+            })
+            await tx.permission.createMany({
+                data: actions.reduce((acum, action) => {
+                    let { instance, permissions } = action
+                    let arr = permissions.map((permission) => {
+                        return {
+                            id: uuidv4(),
+                            createdBy: userId,
+                            instance,
+                            permission,
+                            createdAt: new Date(),
+                            userId: result[0].id
+                        }
+                    })
+                    acum.push(...arr)
+                    return acum
+                }, [])
+            })
         })
 
         return {

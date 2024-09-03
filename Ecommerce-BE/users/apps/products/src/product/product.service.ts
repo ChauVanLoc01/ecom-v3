@@ -1,4 +1,5 @@
 import { PrismaServiceProduct } from '@app/common/prisma/product_prisma.service'
+import { MailerService } from '@nestjs-modules/mailer'
 import { InjectQueue } from '@nestjs/bull'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import {
@@ -18,6 +19,7 @@ import { BackgroundAction, BackgroundName } from 'common/constants/background-jo
 import {
     createCronJobToUpdateProductSale,
     emit_update_product_whenCreatingOrder,
+    getEmailStore,
     getStoreDetail,
     updateProductSaleWhenCreatingOrder,
     updateQuantityProductSalePromotion
@@ -59,10 +61,12 @@ export class ProductService {
         @Inject('STORE_SERVICE') private readonly store_client: ClientProxy,
         @Inject('PRODUCT_SERVICE') private readonly product_client: ClientProxy,
         @Inject('ORDER_SERVICE') private readonly order_client: ClientProxy,
+        @Inject('USER_SERVICE') private readonly user_client: ClientProxy,
         private readonly configService: ConfigService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private schedulerRegistry: SchedulerRegistry,
-        @InjectQueue(BackgroundName.product) private productBackgroundQueue: Queue
+        @InjectQueue(BackgroundName.product) private productBackgroundQueue: Queue,
+        private readonly mailService: MailerService
     ) {}
 
     async getALlProductForUser(query: QueryProductType): Promise<Return> {
@@ -270,18 +274,18 @@ export class ProductService {
 
             let where: Prisma.ProductWhereInput = {
                 storeId,
-                category,
                 status,
+                category,
+                createdAt: {
+                    gte: min_date,
+                    lte: max_date
+                },
                 currentQuantity: {
                     gt: 0
                 },
                 priceAfter: {
                     lte: price_max,
                     gte: price_min
-                },
-                createdAt: {
-                    gte: min_date,
-                    lte: max_date
                 }
             }
 
@@ -964,11 +968,7 @@ export class ProductService {
                 ) as Pick<
                     RollbackOrder['products'][number],
                     'id' | 'price_after' | 'original_quantity'
-                >[],
-                {
-                    attempts: 3,
-                    removeOnComplete: true
-                }
+                >[]
             )
             payload.payload.products.forEach((product) => {
                 let {
@@ -1025,11 +1025,7 @@ export class ProductService {
                 console.log('::::::::commit order - update PRODUCT:::::::::::')
                 await this.productBackgroundQueue.add(
                     BackgroundAction.createCronJobToUpdateProduct,
-                    tmp.product,
-                    {
-                        attempts: 3,
-                        removeOnComplete: true
-                    }
+                    tmp.product
                 )
             }
             if (tmp.product_sale.length) {
@@ -1749,5 +1745,51 @@ export class ProductService {
                 result: null
             }
         }
+    }
+
+    async updateQuantityAfterSale(
+        products: { productId: string; currentQuantity: number }[],
+        storeId: string
+    ) {
+        let html = `<div>
+                        <h3>Quá trình hoàn lại số lượng sau chương trình Flash Sale thất bại. Vui lòng cập nhật lại số lượng sản phẩm như bảng bên dưới.</h3>
+                        <table>
+                            <tr>
+                                <th>Mã sản phẩm</th>
+                                <th>Số lượng còn lại</th>
+                            </tr>`
+        let result = await Promise.allSettled(
+            products.map((product) => {
+                return this.prisma.product.update({
+                    where: {
+                        id: product.productId
+                    },
+                    data: {
+                        currentQuantity: {
+                            increment: product.currentQuantity
+                        }
+                    }
+                })
+            })
+        )
+
+        let email = await firstValueFrom(this.user_client.send(getEmailStore, storeId))
+        result.forEach((item, idx) => {
+            if (item.status === 'rejected') {
+                html.concat(`<tr>
+                                <td>${products[idx].productId}</td>
+                                <td>${products[idx].currentQuantity}</td>
+                            </tr>`)
+            }
+        })
+
+        html.concat('</table></div>')
+
+        const email_infor = {
+            html,
+            subject: 'Cập nhật số lượng sản phẩm sau chương trình FlashSale',
+            to: email
+        }
+        this.mailService.sendMail(email_infor)
     }
 }

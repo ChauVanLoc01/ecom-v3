@@ -51,6 +51,12 @@ export class EmployeeController {
         return this.empService.createNewEmployee(user, body)
     }
 
+    @Roles(Role.ADMIN)
+    @Post('sub-admin-register')
+    createSubAdmin(@CurrentUser() user: CurrentStoreType, @Body() body: CreateEmployee) {
+        return this.empService.createNewEmployee(user, body)
+    }
+
     @Roles(Role.USER)
     @UseGuards(JwtGuard)
     @Put('employee-profile')

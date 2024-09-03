@@ -181,9 +181,9 @@ export class VoucherService {
                 throw new NotFoundException('Mã giảm giá không tồn tại')
             }
 
-            if (voucherExist.currentQuantity !== voucherExist.initQuantity) {
-                throw new BadRequestException('Không thể cập nhật mã giảm giá đã sử dụng')
-            }
+            // if (voucherExist.currentQuantity !== voucherExist.initQuantity) {
+            //     throw new BadRequestException('Không thể cập nhật mã giảm giá đã sử dụng')
+            // }
             await this.prisma.$transaction(async (tx) => {
                 let voucher_update = {
                     code,
@@ -520,9 +520,16 @@ export class VoucherService {
             }
             let vouchers = await this.prisma.voucher.findMany({
                 where: {
-                    storeId: {
-                        in: storesID
-                    },
+                    OR: [
+                        {
+                            storeId: {
+                                in: storesID
+                            }
+                        },
+                        {
+                            type: VoucherType.global
+                        }
+                    ],
                     status: Status.ACTIVE,
                     type: Status.HIDDEN,
                     endDate: {
@@ -678,7 +685,6 @@ export class VoucherService {
                     result: null
                 })
                 commit_create_order_success([this.orderClient, this.productClient], payload as any)
-                console.log('::::::::::map::::::::::::', JSON.stringify([...map.values()]))
                 map.forEach(({ quantity, storeId, voucherId }) => {
                     emit_update_quantity_of_voucher(this.socketClient, {
                         quantity,
@@ -686,18 +692,16 @@ export class VoucherService {
                         voucherId
                     })
                 })
+                let payload_bg = [...map.values()].reduce((acum, e) => {
+                    if (e) {
+                        acum.push(e.voucherId)
+                    }
+                    return acum
+                }, [])
+
                 await this.voucherBackgroundQueue.add(
                     BackgroundAction.createCronJobVoucherToUpdateQuanttiy,
-                    [...map.values()].reduce((acum, e) => {
-                        if (e) {
-                            acum.push(e.voucherId)
-                        }
-                        return acum
-                    }, []),
-                    {
-                        attempts: 3,
-                        removeOnComplete: true
-                    }
+                    payload_bg
                 )
             }
         } catch (err) {
@@ -894,7 +898,7 @@ export class VoucherService {
     async getGlobalVoucherForUser(): Promise<Return> {
         const vouchers = await this.prisma.voucher.findMany({
             where: {
-                type: VoucherType.global,
+                storeId: null,
                 currentQuantity: {
                     gt: 0
                 },

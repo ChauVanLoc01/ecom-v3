@@ -44,3 +44,6 @@ export const StorePermission = ({ children }: Pick<Props, 'children'>) => {
 export const UserPermission = ({ children }: Pick<Props, 'children'>) => {
     return <Permission instance={instance.user}>{children}</Permission>
 }
+export const SubAdminPermission = ({ children }: Pick<Props, 'children'>) => {
+    return <Permission instance={instance.sub_admin}>{children}</Permission>
+}

@@ -403,6 +403,12 @@ export class StoreService {
         const where: Prisma.StoreWhereInput = {
             OR: [
                 {
+                    id: {
+                        contains: search_key
+                    },
+                    ...general_user_where
+                },
+                {
                     name: {
                         contains: search_key
                     },

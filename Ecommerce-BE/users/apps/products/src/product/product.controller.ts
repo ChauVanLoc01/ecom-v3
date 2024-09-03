@@ -5,14 +5,13 @@ import {
     addingProductToSale,
     commit_order,
     countProduct,
-    createProductOrder,
     getAllProductWithProductOrder,
     getProductImageByProductSalePromotion,
-    getProductOrderByRating,
     roll_back_order,
     rollbackAddingProductToSale,
     rollbackUpdateQuantiyProductsWhenCancelOrder,
     update_Product_WhenCreatingOrder,
+    update_quantity_to_product_after_sale,
     updateQuantiyProductsWhenCancelOrder,
     updatingProductToSale
 } from 'common/constants/event.constant'
@@ -22,7 +21,6 @@ import {
     analytic_permission,
     instance,
     Instance,
-    order_permission,
     Permission,
     product_permission,
     Roles
@@ -272,5 +270,17 @@ export class ProductController {
     ) {
         console.log('update product sale from product side', JSON.stringify(payload))
         return this.productsService.updatingProductToSale(payload)
+    }
+
+    @Public()
+    @EventPattern(update_quantity_to_product_after_sale)
+    updateQuantityAfterSale(
+        @Payload()
+        payload: {
+            product: { productId: string; currentQuantity: number }[]
+            storeId: string
+        }
+    ) {
+        return this.productsService.updateQuantityAfterSale(payload.product, payload.storeId)
     }
 }

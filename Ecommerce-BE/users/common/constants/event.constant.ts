@@ -21,6 +21,8 @@ export const getStoreExist = 'get::store:exist'
 
 export const sendMail = 'send::mail'
 
+export const getEmailStore = 'get::email::store'
+
 export const updateStoreRoleId = 'user::update::storeroleid'
 
 export const getStoreDetail = 'user::get::store::detail'
@@ -107,3 +109,5 @@ export const rollbackUpdatingProductToSale =
     'rollback::updating::product::to::sale::product::client'
 
 export const forceEmployeeLogin = 'forceEmployeeLogin'
+
+export const update_quantity_to_product_after_sale = 'update::quantity::to::product::after::sale'

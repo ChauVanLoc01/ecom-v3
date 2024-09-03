@@ -67,6 +67,7 @@ export class UserController {
         return this.userService.userStoreUpdateProfile(user, body)
     }
 
+    @Public()
     @MessagePattern(updateStoreRoleId)
     updateStoreRoleId(@Payload() payload: { userId: string; storeRolePayload: any }) {
         return this.userService.updateStoreRole(payload.userId, payload.storeRolePayload)

@@ -10,7 +10,11 @@ import { VoucherService } from './voucher.service'
 @Module({
     imports: [
         BullModule.registerQueue({
-            name: BackgroundName.voucher
+            name: BackgroundName.voucher,
+            defaultJobOptions: {
+                removeOnComplete: true,
+                attempts: 3
+            }
         })
     ],
     controllers: [VoucherController],

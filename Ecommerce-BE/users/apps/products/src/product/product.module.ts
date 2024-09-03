@@ -11,9 +11,9 @@ import { BackgroundName } from 'common/constants/background-job.constant'
 import { QueueName } from 'common/constants/queue.constant'
 import { diskStorage } from 'multer'
 import { v4 as uuidv4 } from 'uuid'
+import { ProductConsummer } from '../workers/product.worker'
 import { ProductController } from './product.controller'
 import { ProductService } from './product.service'
-import { ProductConsummer } from '../workers/product.worker'
 
 @Module({
     imports: [
@@ -108,6 +108,26 @@ import { ProductConsummer } from '../workers/product.worker'
                 }
             ]
         }),
+        ClientsModule.registerAsync({
+            isGlobal: true,
+            clients: [
+                {
+                    name: 'USER_SERVICE',
+                    imports: [ConfigModule],
+                    useFactory: (configService: ConfigService) => ({
+                        transport: Transport.RMQ,
+                        options: {
+                            urls: [configService.get<string>('rabbitmq.uri')],
+                            queue: QueueName.user,
+                            queueOptions: {
+                                durable: true
+                            }
+                        }
+                    }),
+                    inject: [ConfigService]
+                }
+            ]
+        }),
         MulterModule.register({
             storage: diskStorage({
                 destination(req, file, callback) {
@@ -119,7 +139,11 @@ import { ProductConsummer } from '../workers/product.worker'
             })
         }),
         BullModule.registerQueue({
-            name: BackgroundName.product
+            name: BackgroundName.product,
+            defaultJobOptions: {
+                attempts: 3,
+                removeOnComplete: true
+            }
         }),
         ConfigModule,
         PrismaModule

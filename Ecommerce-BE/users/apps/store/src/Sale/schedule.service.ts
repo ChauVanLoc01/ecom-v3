@@ -4,7 +4,11 @@ import { Inject, Injectable } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule'
 import { Cache } from 'cache-manager'
-import { currentSalePromotion, updateCurrentSalePromotionId } from 'common/constants/event.constant'
+import {
+    currentSalePromotion,
+    update_quantity_to_product_after_sale,
+    updateCurrentSalePromotionId
+} from 'common/constants/event.constant'
 import { SalePromotion } from 'common/constants/sale-promotion.constant'
 import { Status } from 'common/enums/status.enum'
 import { CronJob } from 'cron'
@@ -36,7 +40,8 @@ export class ScheduleService {
         private readonly prisma: PrismaServiceStore,
         private readonly scheduleRegister: SchedulerRegistry,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        @Inject('SOCKET_SERVICE') private readonly socket_client: ClientProxy
+        @Inject('SOCKET_SERVICE') private readonly socket_client: ClientProxy,
+        @Inject('PRODUCT_SERVICE') private productClient: ClientProxy
     ) {}
 
     calDate(payload: Date) {
@@ -67,7 +72,7 @@ export class ScheduleService {
         return tmp
     }
 
-    @Cron('1 49 * * * 1', {
+    @Cron('1 30 3 * * 1', {
         name: 'auto creating sale promotion'
     })
     async autoCreatingSalePromotion() {
@@ -76,7 +81,7 @@ export class ScheduleService {
     }
 
     async createSalePromotion(name: string, second: number, data: Date[]) {
-        const cron_job = new CronJob(`${second} 50 * * * *`, async () => {
+        const cron_job = new CronJob(`${second} 31 3 * * 1`, async () => {
             await Promise.all(
                 data.map((date) => {
                     let formatDate = format(sub(date, { hours: 7 }), 'HH:mm dd-MM-yyyy')
@@ -194,6 +199,57 @@ export class ScheduleService {
                 })
             }
             await process(tx)
+        })
+    }
+
+    @Cron('1 1 */1 * * *')
+    async updateRemainingQuantityToProduct() {
+        let date = sub(new Date(), { minutes: 10 })
+        const sale_promotion = await this.prisma.salePromotion.findFirst({
+            where: {
+                startDate: {
+                    equals: startOfHour(date)
+                },
+                endDate: {
+                    equals: endOfHour(date)
+                }
+            },
+            select: {
+                id: true
+            }
+        })
+        if (!sale_promotion) {
+            return
+        }
+        const stores = await this.prisma.storePromotion.findMany({
+            where: {
+                salePromotionId: sale_promotion.id
+            },
+            select: {
+                id: true
+            }
+        })
+        const products = await Promise.all(
+            stores.map((store) => {
+                return this.prisma.productPromotion.findMany({
+                    where: {
+                        storePromotionId: store.id,
+                        currentQuantity: {
+                            gt: 0
+                        }
+                    },
+                    select: {
+                        currentQuantity: true,
+                        productId: true
+                    }
+                })
+            })
+        )
+        products.forEach((product, idx) => {
+            this.productClient.emit(update_quantity_to_product_after_sale, {
+                product,
+                storeId: stores[idx].id
+            })
         })
     }
 }

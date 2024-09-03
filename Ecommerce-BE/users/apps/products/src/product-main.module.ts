@@ -9,6 +9,7 @@ import * as redisStore from 'cache-manager-redis-store'
 import { CategoryModule } from './category/category.module'
 import { ProductModule } from './product/product.module'
 import { SearchModule } from './search/search.module'
+import { MailerModule } from '@nestjs-modules/mailer'
 
 @Module({
     imports: [
@@ -34,6 +35,16 @@ import { SearchModule } from './search/search.module'
             })
         }),
         ScheduleModule.forRoot(),
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+                transport: configService.get<string>('bullqueue.mail_transport'),
+                defaults: {
+                    from: configService.get<string>('bullqueue.my_mail')
+                }
+            })
+        }),
         ConfigModule,
         PrismaModule,
         ProductModule,

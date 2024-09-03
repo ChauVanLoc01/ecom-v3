@@ -12,6 +12,7 @@ import { RatingModule } from './Rating/rating.module'
 import { SaleModule } from './Sale/sale.module'
 import { StoreModule } from './Store/store.module'
 import { VoucherModule } from './Voucher/voucher.module'
+import { MailerModule } from '@nestjs-modules/mailer'
 
 @Module({
     imports: [
@@ -134,6 +135,16 @@ import { VoucherModule } from './Voucher/voucher.module'
                 redis: {
                     host: configService.get<string>('bullqueue.host'),
                     port: configService.get<number>('bullqueue.port')
+                }
+            })
+        }),
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+                transport: configService.get<string>('bullqueue.mail_transport'),
+                defaults: {
+                    from: configService.get<string>('bullqueue.my_mail')
                 }
             })
         }),

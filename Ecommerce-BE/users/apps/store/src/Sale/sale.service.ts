@@ -76,16 +76,6 @@ export class SaleService {
         try {
             const { storeId } = user
             let { date } = query
-            console.log(
-                'startOfWeek',
-                sub(date, { hours: 8 }),
-                startOfWeek(date, { weekStartsOn: 1 })
-            )
-            console.log(
-                'endOfWeek',
-                add(date, { hours: 7 }),
-                add(endOfWeek(date, { weekStartsOn: 1 }), { hours: 8 })
-            )
             const promotions = await this.prisma.salePromotion.findMany({
                 where: {
                     startDate: {

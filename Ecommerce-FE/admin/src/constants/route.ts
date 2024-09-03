@@ -16,7 +16,8 @@ export const route = {
     rating: 'rating',
     flashSale: 'flash-sale',
     user: 'user',
-    over_view: 'over_view'
+    over_view: 'over-view',
+    sub_admin: 'sub-admin'
 }
 
 export const route_default_with_role: Record<OBJECT, string> = {

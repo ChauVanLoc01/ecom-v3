@@ -7,6 +7,7 @@ import { SiGoogleanalytics } from 'react-icons/si'
 import Select from 'src/components/Select'
 import { instance, SideNavData } from 'src/constants/role'
 import { AppContext } from 'src/contexts/AppContext'
+import { FaUserCog } from 'react-icons/fa'
 
 const Icon = {
     MdFlashOn: <MdFlashOn />,
@@ -17,7 +18,8 @@ const Icon = {
     SiGoogleanalytics: <SiGoogleanalytics />,
     MdSupervisorAccount: <MdSupervisorAccount />,
     IoStorefront: <IoStorefront />,
-    IoTicket: <IoTicket />
+    IoTicket: <IoTicket />,
+    FaUserCog: <FaUserCog />
 }
 
 const SideNav = () => {

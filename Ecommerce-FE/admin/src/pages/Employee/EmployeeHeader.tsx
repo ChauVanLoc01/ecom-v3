@@ -2,14 +2,15 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { AlertDialog, Button, DataList, Flex, Kbd, Spinner, Text, TextField } from '@radix-ui/themes'
 import { QueryObserverResult, RefetchOptions, useMutation } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { EmployeeApi } from 'src/apis/employee.api'
-import { instance } from 'src/constants/role'
+import { employee_permission, instance } from 'src/constants/role'
 import { EmployeeList, EmployeeQuery } from 'src/types/employee.type'
 import { CreateEmployee, register_employee_schema } from 'src/utils/employee.schema'
 import EmployeePermission from './EmployeePermission'
+import { AppContext } from 'src/contexts/AppContext'
 
 type EmployeeHeaderProps = {
     analyticsData: { all: number; actives: number; blocks: number }
@@ -28,6 +29,7 @@ type EmployeeHeaderProps = {
 }
 
 const EmployeeHeader = ({ refetch, analyticsData: { actives, all, blocks } }: EmployeeHeaderProps) => {
+    const { isCan } = useContext(AppContext)
     const [openCreateEmployee, setOpenCreateEmployee] = useState<boolean>(false)
     const [permission, setPermission] = useState<Partial<Record<instance, string[]>> | undefined>(undefined)
     const { control, handleSubmit, setError } = useForm<CreateEmployee>({
@@ -64,6 +66,8 @@ const EmployeeHeader = ({ refetch, analyticsData: { actives, all, blocks } }: Em
         mutate({ ...data, actions: tmp })
     }
 
+    console.log('isCan.employee?.[employee_permission.create]', isCan.employee?.[employee_permission.create])
+
     return (
         <Flex gapX={'5'} align={'center'}>
             <Text weight='medium' size={'4'}>
@@ -76,9 +80,11 @@ const EmployeeHeader = ({ refetch, analyticsData: { actives, all, blocks } }: Em
                 Đã khóa: <Kbd>{blocks}</Kbd> nhân viên
             </Text>
             <AlertDialog.Root open={openCreateEmployee} onOpenChange={setOpenCreateEmployee}>
-                <AlertDialog.Trigger>
-                    <Button className='bg-blue text-white'>Tạo nhân viên</Button>
-                </AlertDialog.Trigger>
+                {isCan.employee?.[employee_permission.create] && (
+                    <AlertDialog.Trigger>
+                        <Button className='bg-blue text-white'>Tạo nhân viên</Button>
+                    </AlertDialog.Trigger>
+                )}
                 <AlertDialog.Content maxWidth='550px' className='!rounded-8'>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <AlertDialog.Title>Tạo mới nhân viên</AlertDialog.Title>

@@ -3,6 +3,7 @@ import { Avatar, Box, Button, Card, Code, Dialog, Flex, IconButton, Skeleton, Sp
 import { UseMutateFunction, useQuery } from '@tanstack/react-query'
 import { AxiosResponse } from 'axios'
 import { user_api } from 'src/apis/user.api'
+import CopyText from 'src/components/CopyText/CopyText'
 import { OrderStatus } from 'src/constants/store.constants'
 import { User } from 'src/types/auth.type'
 
@@ -52,12 +53,7 @@ const UpdateStatus = ({ open, setOpen, updateStatus, selectedUser, isUpdating }:
                                 {isThereStore.name}
                             </Text>
                             <Flex align={'center'} gapX={'2'}>
-                                <Code size='2' color='gray' className='line-clamp-1'>
-                                    {isThereStore.id}
-                                </Code>
-                                <IconButton size='1' aria-label='Copy value' color='gray' variant='ghost'>
-                                    <CopyIcon />
-                                </IconButton>
+                                <CopyText text={isThereStore.id} />
                             </Flex>
                         </Box>
                     </Flex>

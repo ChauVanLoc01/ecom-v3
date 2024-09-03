@@ -14,7 +14,7 @@ type ProductAllProps = {
 
 const ProductAll = ({ products }: ProductAllProps) => {
     const param = useParams()
-    const [query, setQuery] = useState<ProductListQuery>({ sold: 'desc', limit: 8 })
+    const [query, setQuery] = useState<ProductListQuery>({ sold: 'desc', limit: 8, status: 'ACTIVE' })
     const [page, setPage] = useState<number>(0)
     const [category, setCategory] = useState<string>()
 

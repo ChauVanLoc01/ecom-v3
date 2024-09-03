@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common'
-import { EventPattern, Payload } from '@nestjs/microservices'
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { sendMail } from 'common/constants/event.constant'
+import { getEmailStore, sendMail } from 'common/constants/event.constant'
 import { CurrentUser } from 'common/decorators/current_user.decorator'
 import { Public } from 'common/decorators/public.decorator'
 import { Roles } from 'common/decorators/roles.decorator'
@@ -92,5 +92,11 @@ export class AuthController {
     @Get('name/:id')
     getUserName(@Param('id') id: string) {
         return this.authService.getUserName(id)
+    }
+
+    @Public()
+    @MessagePattern(getEmailStore)
+    getEmailStore(@Payload() payload: string) {
+        return this.authService.getEmailStore(payload)
     }
 }

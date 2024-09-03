@@ -1,15 +1,13 @@
-FROM node:22-alpine
+FROM node:19-alpine
 
 EXPOSE 3000
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package.json .
 
-RUN yarn install
+RUN yarn
 
 COPY . .
-
-COPY vite.config.ts .
 
 CMD [ "yarn", "dev" ]
