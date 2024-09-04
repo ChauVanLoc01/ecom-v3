@@ -1,3 +1,4 @@
+import { RedisClient } from '@app/common/cache/redis.provider'
 import { PrismaServiceStore } from '@app/common/prisma/store_prisma.service'
 import { Process, Processor } from '@nestjs/bull'
 import { CACHE_MANAGER } from '@nestjs/cache-manager'
@@ -16,7 +17,8 @@ export class VoucherConsummer {
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private readonly configService: ConfigService,
         private schedulerRegistry: SchedulerRegistry,
-        private readonly prisma: PrismaServiceStore
+        private readonly prisma: PrismaServiceStore,
+        @Inject('REDIS_CLIENT') private readonly redis: RedisClient
     ) {}
 
     @Process(BackgroundAction.resetValueVoucherWHenUpdateProductFail)
@@ -65,10 +67,27 @@ export class VoucherConsummer {
                         `:::::::::::Cron job cập nhật số lượng voucher [${voucherId}]::::::::::::::`
                     )
                 } else {
-                    console.log('no exist')
                     let cron_job = new CronJob(CronExpression.EVERY_MINUTE, async () => {
                         try {
-                            let fromCache = await this.cacheManager.get<string>(hashValue)
+                            let hashValue = hash('voucher', voucherId)
+                            let [fromCache, voucherExist] = await Promise.all([
+                                this.redis.get(voucherId),
+                                this.prisma.voucher.findUnique({
+                                    where: {
+                                        id: voucherId
+                                    },
+                                    select: {
+                                        currentQuantity: true
+                                    }
+                                })
+                            ])
+                            if (!fromCache || !voucherExist) {
+                                let cron_job = this.schedulerRegistry.getCronJob(hashValue)
+                                cron_job.stop()
+                                this.schedulerRegistry.deleteCronJob(hashValue)
+                                return
+                            }
+                            if (voucherExist.currentQuantity === +fromCache)
                             if (fromCache) {
                                 let { quantity: quantityFromCache, times } = JSON.parse(
                                     fromCache

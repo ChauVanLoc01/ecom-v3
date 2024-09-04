@@ -39,6 +39,8 @@ import { VoucherQueryDTO } from './dtos/QueryVoucher.dto'
 import { UpdateVoucherDTO } from './dtos/UpdateVoucher.dto'
 import { QueryGlobalVoucherDTO } from './dtos/query_global_voucher.dto'
 import { SearchCodeDTO } from './dtos/search-code.dto'
+import { RedisClient } from '@app/common/cache/redis.provider'
+import { instance } from 'common/decorators/roles.decorator'
 
 @Injectable()
 export class VoucherService {
@@ -51,7 +53,8 @@ export class VoucherService {
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         @Inject('SOCKET_SERVICE') private socketClient: ClientProxy,
         private schedulerRegistry: SchedulerRegistry,
-        @InjectQueue(BackgroundName.voucher) private voucherBackgroundQueue: Queue
+        @InjectQueue(BackgroundName.voucher) private voucherBackgroundQueue: Queue,
+        @Inject('REDIS_CLIENT') private readonly redis: RedisClient
     ) {}
 
     async createVoucher(user: CurrentStoreType, body: CreateVoucherDTO): Promise<Return> {
@@ -601,25 +604,20 @@ export class VoucherService {
             })
             const result = await Promise.all(
                 [...map.values()].map(async ({ voucherId }) => {
-                    if (!voucherId) {
-                        return
-                    }
                     let hashValue = hash('voucher', voucherId)
-                    let fromCache = await this.cacheManager.get<string>(hashValue)
+                    let fromCache = await this.redis.exists(hashValue)
                     if (fromCache) {
-                        let { quantity: quantityFromCache } = JSON.parse(fromCache) as {
-                            quantity: number
-                            times: number
-                        }
-                        if (quantityFromCache == 0) {
+                        let remaining_quantity = await this.redis.decr(hashValue)
+                        if (remaining_quantity < 0) {
                             throw new Error('Voucher đã hết lượt sử dụng')
-                        }
-                        let instance = map.get(voucherId)
-                        if (instance) {
-                            map.set(voucherId, {
-                                ...instance,
-                                quantity: quantityFromCache - map.get(voucherId).count
-                            })
+                        } else {
+                            let instance = map.get(voucherId)
+                            if (instance) {
+                                map.set(voucherId, {
+                                    ...instance,
+                                    quantity: remaining_quantity
+                                })
+                            }
                         }
                     } else {
                         const voucherExist = await this.prisma.voucher.findUnique({
@@ -640,37 +638,22 @@ export class VoucherService {
                         if (voucherExist.currentQuantity == 0) {
                             throw new Error('Voucher đã hết lượt sử dụng')
                         }
-                        let fromCache = await this.cacheManager.get<string>(hashValue)
-                        if (fromCache) {
-                            let { quantity: quantityFromCache } = JSON.parse(fromCache) as {
-                                quantity: number
-                                times: number
-                            }
-                            if (!quantityFromCache) {
-                                throw new Error('Voucher đã hết lượt sử dụng')
-                            }
-                            let instance = map.get(voucherId)
-                            if (instance) {
-                                map.set(voucherId, {
-                                    ...instance,
-                                    quantity: quantityFromCache - map.get(voucherId).count
-                                })
-                            }
+                        let fromCache = await this.redis.exists(hashValue)
+                        if (!fromCache) {
+                            await this.redis.setnx(hashValue, voucherExist.currentQuantity)
+                        }
+                        let remaining_quantity = await this.redis.decr(hashValue)
+                        if (remaining_quantity < 0) {
+                            throw new Error('Voucher đã hết lượt sử dụng')
                         } else {
                             let instance = map.get(voucherId)
-                            if (instance) {
-                                map.set(voucherId, {
-                                    ...instance,
-                                    quantity:
-                                        voucherExist.currentQuantity - map.get(voucherId).count
-                                })
-                            }
+                            map.set(voucherId, {
+                                ...instance,
+                                quantity: remaining_quantity
+                            })
                         }
                     }
-                    return this.cacheManager.set(
-                        hashValue,
-                        JSON.stringify({ quantity: map.get(voucherId).quantity, times: 3 })
-                    )
+                    return true
                 })
             )
             if (result) {

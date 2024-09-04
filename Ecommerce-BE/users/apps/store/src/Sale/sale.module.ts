@@ -1,3 +1,4 @@
+import { RedisProvider } from '@app/common/cache/redis.provider'
 import { PrismaServiceStore } from '@app/common/prisma/store_prisma.service'
 import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
@@ -15,6 +16,13 @@ import { ScheduleService } from './schedule.service'
         })
     ],
     controllers: [SaleController],
-    providers: [SaleService, ScheduleService, PrismaServiceStore, JwtService, ProductSaleConsummer]
+    providers: [
+        SaleService,
+        ScheduleService,
+        PrismaServiceStore,
+        JwtService,
+        ProductSaleConsummer,
+        RedisProvider
+    ]
 })
 export class SaleModule {}

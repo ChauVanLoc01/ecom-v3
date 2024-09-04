@@ -1,3 +1,4 @@
+import { RedisProvider } from '@app/common/cache/redis.provider'
 import { PrismaServiceStore } from '@app/common/prisma/store_prisma.service'
 import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
@@ -18,6 +19,6 @@ import { VoucherService } from './voucher.service'
         })
     ],
     controllers: [VoucherController],
-    providers: [VoucherService, PrismaServiceStore, JwtService, VoucherConsummer]
+    providers: [VoucherService, PrismaServiceStore, JwtService, VoucherConsummer, RedisProvider]
 })
 export class VoucherModule {}

@@ -38,6 +38,7 @@ import { ProductSaleQuery } from './dtos/product-sale-query.dto'
 import { QuerySalePromotionDTO } from './dtos/query-promotion.dto'
 import { CreateSpecialSaleDTO } from './dtos/special-sale.dto'
 import { UpdateProductsSalePromotion } from './dtos/update-product-sale.dto'
+import { RedisClient } from '@app/common/cache/redis.provider'
 
 @Injectable()
 export class SaleService {
@@ -46,7 +47,8 @@ export class SaleService {
         private readonly configService: ConfigService,
         @Inject('PRODUCT_SERVICE') private productClient: ClientProxy,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        @InjectQueue(BackgroundName.product_sale) private productSaleBackground: Queue
+        @InjectQueue(BackgroundName.product_sale) private productSaleBackground: Queue,
+        @Inject('REDIS_CLIENT') private readonly redis: RedisClient
     ) {}
 
     async getSalePromotionDetail(storePromotionId: string): Promise<Return> {
@@ -438,99 +440,43 @@ export class SaleService {
             )
             let { productPromotionId, salePromotionId, buy } = payload
             let remaining_quantity = 0
-            let origin_quantity = 0
             let hashValue = hash('product', productPromotionId)
-            let fromCache = await this.cacheManager.get<string>(hashValue)
-            if (fromCache) {
-                let { quantity, times, ...rest } = JSON.parse(fromCache) as {
-                    quantity: number
-                    times: number
+            const product_promotion = await this.prisma.productPromotion.findUnique({
+                where: {
+                    id: productPromotionId,
+                    salePromotionId,
+                    isDelete: false
+                },
+                select: {
+                    currentQuantity: true
                 }
-                if (!quantity) {
-                    throw new Error('Sản phẩm đã hết hàng')
+            })
+            let { currentQuantity } = product_promotion
+            if (!product_promotion) {
+                throw new Error('Sản phẩm không tồn tại')
+            }
+            if (!currentQuantity) {
+                throw new Error('Sản phẩm đã hết hàng')
+            }
+            if (currentQuantity < buy) {
+                throw new Error('Sản phẩm không đủ số lượng')
+            }
+            if (product_promotion) {
+                let fromCache = await this.redis.exists(hashValue)
+                if (!fromCache) {
+                    await this.redis.setnx(hashValue, product_promotion.currentQuantity)
                 }
-                if (buy > quantity) {
-                    throw new Error('Sản phẩm không đủ số lượng')
-                }
-                origin_quantity = quantity
-                quantity = quantity - buy
-                await this.cacheManager.set(
-                    hashValue,
-                    JSON.stringify({ quantity, times: 3, ...rest })
-                )
-                remaining_quantity = quantity
-            } else {
-                const product_promotion = await this.prisma.productPromotion.findUnique({
-                    where: {
-                        id: productPromotionId,
-                        salePromotionId,
-                        isDelete: false
-                    },
-                    select: {
-                        currentQuantity: true,
-                        priceAfter: true
-                    }
-                })
-                let { currentQuantity, priceAfter } = product_promotion
-                if (!product_promotion) {
-                    throw new Error('Sản phẩm không tồn tại')
-                }
-                if (!currentQuantity) {
-                    throw new Error('Sản phẩm đã hết hàng')
-                }
-                if (currentQuantity < buy) {
-                    throw new Error('Sản phẩm không đủ số lượng')
-                }
-                if (product_promotion) {
-                    let fromCache = await this.cacheManager.get<string>(hashValue)
-                    if (fromCache) {
-                        let { quantity, times, ...rest } = JSON.parse(fromCache) as {
-                            quantity: number
-                            times: number
-                        }
-                        if (!quantity) {
-                            throw new Error('Sản phẩm đã hết hàng')
-                        }
-                        if (buy > quantity) {
-                            throw new Error('Sản phẩm không đủ số lượng')
-                        }
-                        origin_quantity = quantity
-                        quantity = quantity - buy
-                        await this.cacheManager.set(
-                            hashValue,
-                            JSON.stringify({ quantity, times: 3, ...rest })
-                        )
-                        remaining_quantity = quantity
-                    } else {
-                        await this.cacheManager.set(
-                            hashValue,
-                            JSON.stringify({
-                                quantity: currentQuantity - buy,
-                                priceAfter,
-                                times: 3
-                            })
-                        )
-                        origin_quantity = currentQuantity
-                        remaining_quantity = currentQuantity - buy
-                    }
+                remaining_quantity = await this.redis.decr(hashValue)
+                if (remaining_quantity < 0) {
+                    throw new Error('Sản phẩm sale đã hết hàng')
                 }
             }
-            console.log(
-                ':::::::::product sale quantity ',
-                JSON.stringify({
-                    remaining_quantity: remaining_quantity,
-                    original_quantity: origin_quantity,
-                    salePromotionId,
-                    productPromotionId
-                }),
-                ':::::::::::::::'
-            )
             return {
                 msg: 'Cập nhật số lượng product sale thành công',
                 action: true,
                 result: {
-                    remaining_quantity: remaining_quantity,
-                    original_quantity: origin_quantity,
+                    remaining_quantity,
+                    original_quantity: remaining_quantity + buy,
                     salePromotionId,
                     productPromotionId
                 }

@@ -687,61 +687,63 @@ export class ProductService {
                     if (isProductSale(product)) {
                         console.log(':::::::::product sale ==> Cập nhật product sale:::::::::')
                         let { productPromotionId, salePromotionId, buy } = product
+                        let hashValue = hash('product', productPromotionId)
+                        let fromCache = await this.redis.exists(hashValue)
                         map.set(idx, undefined)
-                        const productSale = await firstValueFrom<
-                            MessageReturn<{
-                                remaining_quantity: number
-                                original_quantity: number
-                                salePromotionId: string
-                                productPromotionId: string
-                            }>
-                        >(
-                            this.store_client.send(updateProductSaleWhenCreatingOrder, {
-                                productPromotionId,
-                                salePromotionId: salePromotionId,
-                                buy
-                            })
-                        )
-                        console.log('product SALE', productSale)
-                        if (!productSale.action) {
-                            throw new Error(productSale.msg)
-                        }
-                        if (productSale) {
-                            let {
-                                result: { original_quantity, remaining_quantity }
-                            } = productSale
-                            console.log(
-                                'setQuantity',
-                                JSON.stringify({
-                                    ...product,
-                                    original_quantity,
-                                    remaining_quantity
+                        if (!fromCache) {
+                            const productSale = await firstValueFrom<
+                                MessageReturn<{
+                                    remaining_quantity: number
+                                    original_quantity: number
+                                    salePromotionId: string
+                                    productPromotionId: string
+                                }>
+                            >(
+                                this.store_client.send(updateProductSaleWhenCreatingOrder, {
+                                    productPromotionId,
+                                    salePromotionId: salePromotionId,
+                                    buy
                                 })
                             )
-                            map.set(idx, { ...product, original_quantity, remaining_quantity })
+                            if (!productSale.action) {
+                                throw new Error(productSale.msg)
+                            }
+                            if (productSale) {
+                                let {
+                                    result: { original_quantity, remaining_quantity }
+                                } = productSale
+                                map.set(idx, { ...product, original_quantity, remaining_quantity })
+                            }
+                        } else {
+                            let remaining_quantity = await this.redis.decr(hashValue)
+                            if (remaining_quantity < 0) {
+                                throw new Error('Sản phẩm sale đã hết hàng')
+                            } else {
+                                map.set(idx, {
+                                    ...product,
+                                    original_quantity: remaining_quantity + 1,
+                                    remaining_quantity
+                                })
+                            }
                         }
                         return true
                     } else {
                         let { buy, id: productId } = product
                         let hashValue = hash('product', productId)
-                        let fromCache = await this.cacheManager.get<string>(hashValue)
+                        let fromCache = await this.redis.exists(hashValue)
                         if (fromCache) {
                             console.log('Trường hợp CÓ cache')
-                            let { quantity, priceAfter } = JSON.parse(fromCache) as {
-                                quantity: number
-                                priceAfter: number
-                            }
-                            if (quantity == 0) {
-                                throw new Error('Sản phẩm đã hết hàng')
-                            }
-                            if (buy > quantity) {
+                            let remaining_quantity = await this.redis.decrby(hashValue, buy)
+                            if (remaining_quantity < 0) {
+                                await this.redis.incrby(hashValue, buy)
                                 throw new Error('Sản phẩm không đủ số lượng')
+                            } else {
+                                map.set(idx, {
+                                    ...product,
+                                    remaining_quantity,
+                                    original_quantity: remaining_quantity + buy
+                                })
                             }
-                            map.set(idx, {
-                                ...product,
-                                remaining_quantity: quantity - buy,
-                                original_quantity: quantity
-                            })
                         } else {
                             console.log('Trường hợp KHÔNG CÓ cache')
                             map.set(idx, undefined)
@@ -754,62 +756,38 @@ export class ProductService {
                                     priceAfter: true
                                 }
                             })
-                            console.log('productExist', productExist)
 
                             if (!productExist) {
-                                console.log('Sản phẩm không tồn tại')
                                 map.delete(idx)
                                 throw new Error('Sản phẩm không tồn tại')
                             }
                             if (productExist.currentQuantity == 0) {
-                                console.log('sản phẩm đã hết hàng')
                                 map.delete(idx)
                                 throw new Error('Sản phẩm đã hết hàng')
                             }
                             if (productExist.currentQuantity < buy) {
-                                console.log('Sản phẩm không đủ số lượng')
                                 map.delete(idx)
                                 throw new Error('Sản phẩm không đủ số lượng')
                             }
                             if (productExist) {
-                                console.log('Sản phẩm tồn tại2')
-                                let fromCache_inner = await this.cacheManager.get<string>(hashValue)
-                                if (fromCache_inner) {
-                                    console.log('Trường hợp có cache 2')
-                                    let { quantity } = JSON.parse(fromCache_inner) as {
-                                        quantity: number
-                                    }
-                                    if (quantity == 0) {
-                                        console.log('Sản phẩm đã hết thàng 2')
-                                        throw new Error('Sản phẩm đã hết hàng')
-                                    }
-                                    if (buy > quantity) {
-                                        console.log('sản phẩm không đủ số lượng 2')
-                                        throw new Error('Sản phẩm không đủ số lượng')
-                                    }
-                                    map.set(idx, {
-                                        ...product,
-                                        remaining_quantity: quantity - buy,
-                                        original_quantity: quantity
-                                    })
+                                let fromCache_inner = await this.redis.exists(hashValue)
+                                if (!fromCache_inner) {
+                                    await this.redis.setnx(hashValue, productExist.currentQuantity)
+                                }
+                                let remaining_quantity = await this.redis.decrby(hashValue, buy)
+                                if (remaining_quantity < 0) {
+                                    await this.redis.incrby(hashValue, buy)
+                                    throw new Error('Sản phẩm không đủ số lượng')
                                 } else {
                                     map.set(idx, {
                                         ...product,
-                                        remaining_quantity:
-                                            productExist.currentQuantity - product.buy,
-                                        original_quantity: productExist.currentQuantity
+                                        remaining_quantity,
+                                        original_quantity: remaining_quantity + buy
                                     })
                                 }
                             }
                         }
-                        return this.cacheManager.set(
-                            hashValue,
-                            JSON.stringify({
-                                quantity: map.get(idx).remaining_quantity,
-                                priceAfter: map.get(idx).price_after,
-                                times: 3
-                            })
-                        )
+                        return true
                     }
                 })
             )
